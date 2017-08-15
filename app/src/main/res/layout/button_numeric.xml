@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:background="#424242"
+    android:foreground="?android:attr/selectableItemBackground"
+    android:stateListAnimator="@drawable/touch_item">
+
+    <com.sf.DarkCalculator.AutofitTextView
+        android:id="@+id/text_item"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:fontFamily="sans-serif-light"
+        android:singleLine="true"
+        android:textColor="@color/colorWhite"
+        android:textSize="38sp" />
+
+</FrameLayout>

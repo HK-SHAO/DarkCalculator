@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:padding="26dp">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical">
+
+        <ImageView
+            android:layout_width="100dp"
+            android:layout_height="100dp"
+            android:layout_gravity="center_horizontal"
+            android:src="@mipmap/ic_launcher" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:paddingTop="16dp"
+            android:text="@string/app_name"
+            android:textColor="@color/colorWhite"
+            android:textSize="20sp" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:paddingTop="8dp"
+            android:text="这是烧风用Android Studio开发的第二个作品，马上要开学了，很多坑却还没填完，只好硬着头皮提前上架了，大家见谅。\n\n这是一款兼容性高，功能强大，拥有近60个函数，支持复数运算的计算器，另外还添加了进制转换，大数运算，大写数字等功能。虽然还没有完善，但我会在上学的过程中利用业余时间继续完善它的。\n\n险恶计算器的运算核心使用了GitHub上Iraka-C开源的Calci-kernel项目，非常感谢Iraka-C的开源，这使我省去不少的工作。我在此项目的基础上增加了28个函数，另外也在计算效率上做了一些优化。Calci-kernel项目的作者也开发了一款计算器，叫做Calci计算器，大家有兴趣也可以在酷安下载试试这款计算器。" />
+
+    </LinearLayout>
+
+</ScrollView>

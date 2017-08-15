@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:padding="8dp">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="0px"
+        android:layout_weight="1.0"
+        android:orientation="horizontal">
+
+        <EditText
+            android:id="@+id/edit1_big"
+            android:layout_width="0px"
+            android:layout_height="match_parent"
+            android:layout_weight="1.0"
+            android:digits="0123456789.-+E"
+            android:fontFamily="sans-serif-light"
+            android:gravity="top"
+            android:hint="0"
+            android:inputType="number"
+            android:textCursorDrawable="@drawable/cursor" />
+
+        <View
+            android:layout_width="0px"
+            android:layout_height="match_parent"
+            android:layout_marginBottom="16dp"
+            android:layout_marginTop="16dp"
+            android:layout_weight="0.01"
+            android:background="#757575" />
+
+        <EditText
+            android:id="@+id/edit2_big"
+            android:layout_width="0px"
+            android:layout_height="match_parent"
+            android:layout_weight="1.0"
+            android:digits="0123456789."
+            android:fontFamily="sans-serif-light"
+            android:gravity="top"
+            android:hint="0"
+            android:inputType="number"
+            android:textCursorDrawable="@drawable/cursor" />
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="16dp"
+        android:orientation="horizontal">
+
+        <Button
+            android:id="@+id/button_add"
+            android:layout_width="0px"
+            android:layout_height="wrap_content"
+            android:layout_weight="1.0"
+            android:text="+" />
+
+        <Button
+            android:id="@+id/button_sub"
+            android:layout_width="0px"
+            android:layout_height="wrap_content"
+            android:layout_weight="1.0"
+            android:text="-" />
+
+        <Button
+            android:id="@+id/button_mul"
+            android:layout_width="0px"
+            android:layout_height="wrap_content"
+            android:layout_weight="1.0"
+            android:text="×" />
+
+        <Button
+            android:id="@+id/button_div"
+            android:layout_width="0px"
+            android:layout_height="wrap_content"
+            android:layout_weight="1.0"
+            android:text="÷" />
+
+
+    </LinearLayout>
+
+</LinearLayout>

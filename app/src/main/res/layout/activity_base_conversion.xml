@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:padding="16dp">
+
+    <TextView
+        android:id="@+id/textview_in"
+        android:layout_width="match_parent"
+        android:layout_height="0px"
+        android:layout_weight="0.1"
+        android:text="10 进制:"
+        android:textSize="16sp" />
+
+    <EditText
+        android:id="@+id/text_in"
+        android:layout_width="match_parent"
+        android:layout_height="0px"
+        android:layout_weight="1.0"
+        android:background="@null"
+        android:digits="1234567890qwertyuiopasdfghjklzxcvbnmQWERTYUIOPASDFGHJKLZXCVBNM"
+        android:fontFamily="sans-serif-light"
+        android:gravity="center"
+        android:inputType="number"
+        android:textCursorDrawable="@drawable/cursor"
+        android:textSize="26sp" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="0px"
+        android:layout_weight="0.2"
+        android:orientation="horizontal">
+
+        <SeekBar
+            android:id="@+id/seekbar1"
+            android:layout_width="0px"
+            android:layout_height="wrap_content"
+            android:layout_weight="1.0"
+            android:max="34"
+            android:progress="8" />
+
+        <SeekBar
+            android:id="@+id/seekbar2"
+            android:layout_width="0px"
+            android:layout_height="wrap_content"
+            android:layout_weight="1.0"
+            android:max="34" />
+
+    </LinearLayout>
+
+    <TextView
+        android:id="@+id/textview_out"
+        android:layout_width="match_parent"
+        android:layout_height="0px"
+        android:layout_weight="0.1"
+        android:text="2 进制:"
+        android:textSize="16sp" />
+
+    <TextView
+        android:id="@+id/text_out"
+        android:layout_width="match_parent"
+        android:layout_height="0px"
+        android:layout_weight="1.0"
+        android:fontFamily="sans-serif-light"
+        android:gravity="center"
+        android:text="···"
+        android:textIsSelectable="true"
+        android:textSize="32sp" />
+
+</LinearLayout>

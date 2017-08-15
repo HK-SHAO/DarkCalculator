@@ -1,0 +1,121 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:fitsSystemWindows="true"
+    android:orientation="vertical">
+
+    <android.support.design.widget.AppBarLayout
+        android:layout_width="match_parent"
+        android:layout_height="0px"
+        android:layout_weight="1">
+
+        <android.support.v7.widget.Toolbar
+            android:id="@+id/toolbar"
+            android:layout_width="match_parent"
+            android:layout_height="?attr/actionBarSize"
+            android:background="?attr/colorPrimary" />
+
+        <FrameLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <TextView
+                android:id="@+id/text_state"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:paddingLeft="16dp"
+                android:textSize="18sp" />
+
+            <EditText
+                android:id="@+id/editText"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
+                android:background="@null"
+                android:fontFamily="sans-serif-light"
+                android:gravity="bottom|end"
+                android:inputType="textNoSuggestions"
+                android:paddingLeft="16dp"
+                android:paddingRight="16dp"
+                android:singleLine="true"
+                android:textColor="#eeeeee"
+                android:textCursorDrawable="@drawable/cursor"
+                android:textSize="66sp" />
+
+
+            <HorizontalScrollView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="bottom">
+
+                <TextView
+                    android:id="@+id/text_out"
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:layout_gravity="end"
+                    android:fontFamily="sans-serif-light"
+                    android:paddingLeft="16dp"
+                    android:paddingRight="16dp"
+                    android:singleLine="true"
+                    android:text="···"
+                    android:textSize="48sp" />
+
+            </HorizontalScrollView>
+
+
+        </FrameLayout>
+
+    </android.support.design.widget.AppBarLayout>
+
+    <android.support.v4.widget.DrawerLayout
+        android:id="@+id/drawer_main"
+        android:layout_width="match_parent"
+        android:layout_height="0px"
+        android:layout_weight="1.618">
+
+        <include layout="@layout/content_main" />
+
+        <FrameLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_gravity="start"
+            android:background="#bdbdbd">
+
+            <GridView
+                android:id="@+id/sideBar"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:numColumns="1" />
+
+        </FrameLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_gravity="end"
+            android:background="#bdbdbd"
+            android:orientation="vertical">
+
+            <android.support.design.widget.TabLayout
+                android:id="@+id/tabs_main"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="#bdbdbd"
+                android:elevation="2dp"
+                app:tabIndicatorColor="#424242"
+                app:tabSelectedTextColor="#212121"
+                app:tabTextAppearance="@style/TabLayoutTextStyle"
+                app:tabTextColor="#616161" />
+
+            <android.support.v4.view.ViewPager
+                android:id="@+id/viewPager_drawer"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent" />
+
+        </LinearLayout>
+
+    </android.support.v4.widget.DrawerLayout>
+
+</LinearLayout>
