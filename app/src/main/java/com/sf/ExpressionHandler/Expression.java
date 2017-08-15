@@ -388,6 +388,8 @@ public class Expression {
 
         int funcJump = funcID + paramNum;
         switch (funcJump) {
+            case Function.ROOT + 2:
+                return new Result(new Complex(Math.pow(val[0].re, 1 / val[1].re)));
             case Function.REDUC + 1:
                 if (val[0].re == 0) {
                     return new Result(0).append("0/1");

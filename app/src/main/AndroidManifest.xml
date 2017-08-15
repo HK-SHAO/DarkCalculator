@@ -31,7 +31,9 @@
             android:name=".BaseConversionActivity"
             android:label="进制转换"
             android:screenOrientation="portrait" />
-        <activity android:name=".AboutActivity"></activity>
+        <activity
+            android:name=".AboutActivity"
+            android:screenOrientation="portrait" />
     </application>
 
 </manifest>

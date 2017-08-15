@@ -64,24 +64,24 @@ public class MainActivity extends BaseActivity {
     final private String[] vice = {"CLR", "√", "^", "!", "()", "°", "∞", "x"};
 
     final private String[][] function = {
-            {"sqrt", "cbrt", "rand", "randInt", "recipr", "log", "ln", "logab",
+            {"sqrt", "cbrt", "root", "rand", "randInt", "log", "ln", "logab",
                     "abs", "min", "max", "fact", "sin", "cos", "tan", "asin", "acos",
-                    "atan", "sinh", "cosh", "tanh", "asinh", "acosh", "atanh", "sum", "re",
-                    "im", "arg", "norm", "reg", "conj", "diff", "limit", "eval",
-                    "fzero", "integ", "prec", "base", "exp", "gcd", "lcm", "perm",
-                    "comb", "round", "floor", "ceil", "sign", "gamma", "remn", "prime", "isPrime",
-                    "isOdd", "toDEG", "toRAD", "reduc", "reStart", "setCR", "setTS"},
+                    "atan", "sinh", "cosh", "tanh", "asinh", "acosh", "atanh", "recipr",
+                    "sum", "re", "im", "arg", "norm", "reg", "conj", "diff", "limit",
+                    "eval", "fzero", "integ", "exp", "gcd", "lcm", "perm", "comb", "round",
+                    "floor", "ceil", "sign", "gamma", "remn", "reduc", "prime", "isPrime",
+                    "isOdd", "toDEG", "toRAD", "reStart", "setPrec", "setBase", "setCR", "setTS"},
             {"ans", "reg", "π", "e", "F", "h", "ћ", "γ", "φ", "c", "N", "R", "k", "G", "Φ", "me", "mn", "mp"}};
 
     final private String[][] functionVice = {
-            {"平方根", "立方根", "随机复数", "随机整数", "倒数", "十底对数", "e底对数", "对数",
+            {"平方根", "立方根", "开方", "随机复数", "随机整数", "十底对数", "e底对数", "对数",
                     "绝对值", "最小", "最大", "阶乘", "正弦", "余弦", "正切", "反正弦", "反余弦",
                     "反正切", "双曲正弦", "双曲余弦", "双曲正切", "反双曲正弦", "反双曲余弦",
-                    "反双曲正切", "累加求和", "实部", "虚部", "幅角", "模长", "寄存", "共轭复数", "导函数",
-                    "极限", "求值", "函数零点", "定积分", "输出精度", "输出进制",
-                    "e底指数", "最大公约", "最小公倍", "排列", "排列",
-                    "四舍五入", "舍去小数", "小数进一", "取正负号", "伽玛函数", "取余", "质数", "判断质数", "判断奇数",
-                    "转角度", "转弧度", "分数化简", "重启APP", "排列方式", "字体大小"}, {
+                    "反双曲正切", "倒数", "累加求和", "实部", "虚部", "幅角", "模长", "寄存",
+                    "共轭复数", "导函数", "极限", "求值", "函数零点", "定积分", "e底指数",
+                    "最大公约", "最小公倍", "排列", "排列", "四舍五入", "舍去小数", "小数进一",
+                    "取正负号", "伽玛函数", "取余", "分数化简", "质数", "判断质数", "判断奇数",
+                    "转角度", "转弧度", "重启APP", "输出精度", "输出进制", "排列方式", "字体大小"}, {
             "上次运算", "寄存器", "圆周率", "自然底数", "法拉第", "普朗克", "约化普朗克", "欧拉", "黄金分割",
             "光速", "阿伏伽德罗", "理想气体", "玻尔兹曼", "重力", "磁通量子", "电子质量", "质子质量", "中子质量"}};
 

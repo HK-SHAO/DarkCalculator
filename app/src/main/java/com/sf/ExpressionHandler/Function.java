@@ -67,6 +67,7 @@ class Function {
     static final int TORAD = 580;
     static final int REMN = 590;
     static final int REDUC = 600;
+    static final int ROOT = 610;
 
     static class Serial { // function name - serial struct
         String funcName;
@@ -118,8 +119,8 @@ class Function {
             new Serial("sum", SUM, 1),
             new Serial("perm", PERM),
             new Serial("comb", COMB),
-            new Serial("prec", PREC),
-            new Serial("base", BASE),
+            new Serial("setPrec", PREC),
+            new Serial("setBase", BASE),
 
             new Serial("cbrt", CBRT),
             new Serial("log", LOG),
@@ -148,5 +149,6 @@ class Function {
             new Serial("toRAD", TORAD),
             new Serial("remn", REMN),
             new Serial("reduc", REDUC),
+            new Serial("root", ROOT),
     };
 }
