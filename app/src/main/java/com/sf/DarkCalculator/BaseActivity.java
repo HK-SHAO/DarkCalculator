@@ -33,7 +33,7 @@ public class BaseActivity extends AppCompatActivity {
         preferences = PreferenceManager.getDefaultSharedPreferences(this);
         Resources res = super.getResources();
         Configuration config = res.getConfiguration();
-        config.fontScale = preferences.getFloat("textSize", 1);
+        config.fontScale = preferences.getFloat("textSize", 1.0f);
         res.updateConfiguration(config, res.getDisplayMetrics());
         return res;
     }

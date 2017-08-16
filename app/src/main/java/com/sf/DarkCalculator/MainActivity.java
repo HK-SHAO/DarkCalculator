@@ -27,6 +27,8 @@ import android.widget.EditText;
 import android.widget.GridView;
 import android.widget.TextView;
 
+import com.sf.ExpressionHandler.Constants;
+
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -45,7 +47,6 @@ import java.util.regex.Pattern;
  * ░     ░ ░      ░  ░
  */
 
-
 public class MainActivity extends BaseActivity {
 
     public static MainActivity activity;
@@ -61,7 +62,7 @@ public class MainActivity extends BaseActivity {
 
     private Pattern keywords;
     final private String[] operator = {"DEL", "÷", "×", "-", "+", "%", ",", "i"};
-    final private String[] vice = {"CLR", "√", "^", "!", "()", "°", "∞", "x"};
+    final private String[] operatorVice = {"CLR", "√", "^", "!", "()", "°", "∞", "x"};
 
     final private String[][] function = {
             {"sqrt", "cbrt", "root", "rand", "randInt", "log", "ln", "logab",
@@ -74,18 +75,18 @@ public class MainActivity extends BaseActivity {
             {"ans", "reg", "π", "e", "F", "h", "ћ", "γ", "φ", "c", "N", "R", "k", "G", "Φ", "me", "mn", "mp"}};
 
     final private String[][] functionVice = {
-            {"平方根", "立方根", "开方", "随机复数", "随机整数", "十底对数", "e底对数", "对数",
+            {"平方根", "立方根", "开方", "随机复数", "随机整数", "十底对数", "自然对数", "对数",
                     "绝对值", "最小", "最大", "阶乘", "正弦", "余弦", "正切", "反正弦", "反余弦",
                     "反正切", "双曲正弦", "双曲余弦", "双曲正切", "反双曲正弦", "反双曲余弦",
-                    "反双曲正切", "倒数", "累加求和", "实部", "虚部", "幅角", "模长", "寄存",
+                    "反双曲正切", "倒数", "累加求和", "实部", "虚部", "辐角", "模长", "寄存",
                     "共轭复数", "导函数", "极限", "求值", "函数零点", "定积分", "e底指数",
-                    "最大公约", "最小公倍", "排列", "排列", "四舍五入", "舍去小数", "小数进一",
+                    "最大公约", "最小公倍", "排列", "组合", "四舍五入", "向下取整", "向上取整",
                     "取正负号", "伽玛函数", "取余", "分数化简", "质数", "判断质数", "判断奇数",
                     "转角度", "转弧度", "重启APP", "输出精度", "输出进制", "排列方式", "字体大小"}, {
             "上次运算", "寄存器", "圆周率", "自然底数", "法拉第", "普朗克", "约化普朗克", "欧拉", "黄金分割",
-            "光速", "阿伏伽德罗", "理想气体", "玻尔兹曼", "重力", "磁通量子", "电子质量", "质子质量", "中子质量"}};
+            "光速", "阿伏伽德罗", "理想气体", "玻尔兹曼", "万有引力", "磁通量子", "电子质量", "质子质量", "中子质量"}};
 
-    final private String[] stringList = {"科学计算", "大数计算", "时间计算", "进制转换",
+    final private String[] functionList = {"科学计算", "大数计算", "时间计算", "进制转换",
             "方程式配平", "分子量计算", "亲戚关系计算", "大写数字", "汇率转换", "单位转换"};
 
     private String[] numeric = {"7", "8", "9", "4", "5", "6", "1", "2", "3", "·", "0", "=", "A", "B", "C", "D", "E", "F",
@@ -195,13 +196,13 @@ public class MainActivity extends BaseActivity {
     private void initSideBar() {
         final GridView sideBar = (GridView) findViewById(R.id.sideBar);
         barView.add(sideBar);
-        GridViewAdapter sideBarAdapter = new GridViewAdapter(this, sideBar, Arrays.asList(stringList), R.layout.button_sidebar, new View.OnClickListener() {
+        GridViewAdapter sideBarAdapter = new GridViewAdapter(this, sideBar, Arrays.asList(functionList), R.layout.button_sidebar, new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 TextView textView = (TextView) v.findViewById(R.id.text_item);
                 String text = textView.getText().toString();
                 int i = 0;
-                for (String str : stringList) {
+                for (String str : functionList) {
                     i++;
                     if (text.equals(str))
                         break;
@@ -350,7 +351,7 @@ public class MainActivity extends BaseActivity {
             }
         });
         barAdapter.add(operatorAdapter);
-        operatorAdapter.setViceText(Arrays.asList(vice));
+        operatorAdapter.setViceText(Arrays.asList(operatorVice));
         operatorAdapter.setOnLongClickListener(new View.OnLongClickListener() {
             @Override
             public boolean onLongClick(View v) {
@@ -400,6 +401,7 @@ public class MainActivity extends BaseActivity {
                                         out.setText(value[0]);
                                     } else {
                                         out.setTextColor(0xffeeeeee);
+                                        Constants.constants.set(0, new String[]{"ans", value[0]});
                                         if (value[0].getBytes().length > 1000) {
                                             out.setText("数值太大，请长按此处显示结果");
                                             ResultsActivity.actionStart(context, value[0]);
@@ -439,7 +441,6 @@ public class MainActivity extends BaseActivity {
             method.setAccessible(true);
             method.invoke(editText, false);
         } catch (Exception e) {
-            ExceptionsHandler.show(this, e.toString());
         }
         AutofitHelper.create(editText).setMinTextSize(28);
         editText.setFocusable(true);
