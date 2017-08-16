@@ -123,7 +123,7 @@ class Function {
             new Serial("setBase", BASE),
 
             new Serial("cbrt", CBRT),
-            new Serial("log", LOG),
+            new Serial("lg", LOG),
             new Serial("sinh", SINH),
             new Serial("cosh", COSH),
             new Serial("tanh", TANH),
@@ -139,7 +139,7 @@ class Function {
             new Serial("gcd", GCD),
             new Serial("lcm", LCM),
             new Serial("isOdd", ISODD),
-            new Serial("logab", LOGAB),
+            new Serial("log", LOGAB),
             new Serial("sign", SIGN),
             new Serial("reStart", RESTART),
             new Serial("setCR", SETCR),

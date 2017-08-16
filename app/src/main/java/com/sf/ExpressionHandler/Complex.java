@@ -180,7 +180,7 @@ public class Complex {
     //======================= Complex Functions ============================
 
     public static Complex logab(Complex c, Complex c2) {
-        return new Complex(Math.log(c.norm().re) / Math.log(c2.norm().re));
+        return new Complex(log(c).re / log(c2).re);
     }
 
     public static boolean isOdd(Complex c) {
@@ -269,7 +269,7 @@ public class Complex {
     }
 
     public static Complex ln(Complex c) {
-        return new Complex(Math.log(c.norm().re));
+        return new Complex(Math.log(c.norm().re), c.arg().re);
     }
 
     public static Complex cbrt(Complex c) {
@@ -286,7 +286,7 @@ public class Complex {
     public static Complex log(Complex c) {
         if (c.re == 0 && c.im == 0)
             return Complex.inv(Inf);
-        return new Complex(Math.log10(c.norm().re), c.arg().re);
+        return new Complex(Math.log10(c.norm().re));
     }
 
     public static Complex sqrt(Complex c) {

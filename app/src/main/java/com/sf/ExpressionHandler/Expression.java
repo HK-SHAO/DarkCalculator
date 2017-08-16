@@ -22,7 +22,6 @@ public class Expression {
     private int[] isAddSubParseResult; // is this an add/sub symbol ?
     private boolean[] isOmitMult; // is '*' omitted here ?
 
-    public volatile boolean isWorking;
     public volatile boolean isExited;
 
     private static final String mathOperator = "+-*/^√×÷!";
@@ -140,8 +139,6 @@ public class Expression {
     // 0+NaN*I is never possible during a calculation
     // and is so used as "No Variable X provided" sign
     public Result value(int l, int r, Complex vX) {
-        if (!isWorking) return new Result(1); // Calculation Thread Halted
-
         if (l > r) {
             return new Result(1).append("表达式语法错误");
         }
@@ -382,22 +379,7 @@ public class Expression {
             case Function.ROOT + 2:
                 return new Result(new Complex(Math.pow(val[0].re, 1 / val[1].re)));
             case Function.REDUC + 1:
-                if (val[0].re == 0) {
-                    return new Result(0).append("0/1");
-                }
-                String[] array;
-                String xs = val[0].toString();
-                array = xs.split("\\.");
-                double a = Double.parseDouble(array[0]);
-                double b = Double.parseDouble(array[1]);
-                int length = array[1].length();
-                Complex fz = new Complex(a * Math.pow(10, length) + b);
-                Complex fm = new Complex(Math.pow(10, length));
-                Complex ys = Complex.gcd(fz, fm);
-                if (val[0].re < 0)
-                    return new Result(val[0].re).append("-" + Complex.div(fz, ys) + "/" + "" + Complex.div(fm, ys));
-                else
-                    return new Result(val[0].re).append("" + Complex.div(fz, ys) + "/" + "" + Complex.div(fm, ys));
+                return new Result(1).append("此函数还未完善");
             case Function.REMN + 2:
                 return new Result(new Complex(val[0].re % val[1].re));
             case Function.TODEG + 1:
@@ -409,7 +391,7 @@ public class Expression {
             case Function.RESTART:
                 MainActivity.activity.finish();
                 MainActivity.actionStart(MainActivity.activity);
-                return new Result(0).append("正在重启");
+                return new Result(0).append("正在重启中");
             case Function.SETCR + 3:
                 double x = val[0].re;
                 double y = val[1].re;
@@ -568,13 +550,13 @@ public class Expression {
             case Function.BASE + 1:
                 int base = (int) Math.round(val[0].re);
                 if (!(base >= 2 && base <= 10 || base == 12 || base == 16))
-                    return new Result(-1).setVal(new Complex(1)).append("base函数的参数参数无效");
+                    return new Result(1).setVal(new Complex(1)).append("base函数的参数参数无效");
                 Result.setBase(base);
                 return new Result(0).append("输出进制被设置为 " + base + " 进制，" + "精度为 " + Result.precision + " 位小数");
             case Function.BASE + 2:
                 base = (int) Math.round(val[1].re);
                 if (!(base >= 2 && base <= 10 || base == 12 || base == 16))
-                    return new Result(-1).setVal(new Complex(1)).append("base函数的参数参数无效");
+                    return new Result(1).setVal(new Complex(1)).append("base函数的参数参数无效");
                 return new Result(new Complex(ParseNumber.toBaseString(val[0].re, base, Result.precision)));
         }
         return new Result(1).append("函数 " + Function.funcList[listPos].funcName + " 参数错误");
@@ -587,10 +569,10 @@ public class Expression {
         char cj = text.charAt(p - 1);
 
         boolean iscjPreSymbol = (cj == ')' || cj == '∞' || cj == 'π' || cj == '°' || cj == '%');
-        boolean iscjNumber = (cj >= '0' && cj <= '9' || cj >= 'A' && cj <= 'Z' || cj == '.');
+        boolean iscjNumber = (cj >= '0' && cj <= '9' || cj == '.');
         boolean iscjBase = ParseNumber.isBaseSymbol(cj);
-        boolean iscjFunc = (cj >= 'a' && cj <= 'z' || cj == '_');
-        boolean isciNumber = (ci >= '0' && ci <= '9' || ci >= 'A' && ci <= 'Z' || ci == '.');
+        boolean iscjFunc = ((cj >= 'a' && cj <= 'z') || cj == '_');
+        boolean isciNumber = (cj >= '0' && cj <= '9' || cj == '.');
         //boolean isciBase=ParseNumber.isBaseSymbol(ci);
 
         boolean case1 = (ci >= 'a' && ci <= 'z' || ci == '_' || ci == '(') && (iscjNumber || iscjPreSymbol || iscjBase);
@@ -603,7 +585,6 @@ public class Expression {
     public Result value() { // Entrance !
         // 0+NaNi id a sign for "No Variable X provided" initially
 
-        isWorking = true;
         isExited = false;
 
         if (brDiff != 0) {
@@ -716,8 +697,6 @@ public class Expression {
 
         for (int i = 0; i <= iter; i++) { // normally no more than 20 iter., but for eq. such as x^.2, more is needed.
 
-            if (!isWorking) return new Result(3); // Calculation Thread Halted
-
             Complex d1 = Complex.mul(Complex.sub(x2, x1), r2);
             Complex d2 = Complex.sub(r2, r1);
 
@@ -778,7 +757,6 @@ public class Expression {
         Result rp;
         for (double M = 1.0; M > 0.05; M *= 0.7) {
 
-            if (!isWorking) return new Result(1); // Calculation Thread Halted
             //System.out.println("Relaxation M = "+new Double(M).toString()
             //		+" , MaxLoop = "+new Integer((int)Math.round(1500/Math.sqrt(M))).toString());
             rp = solve(l, r, x0, new Complex(M), (int) Math.round(1500 / Math.sqrt(M)));
@@ -854,8 +832,6 @@ public class Expression {
     private boolean isIntegOverTolerance = false; // only checked for once, reduce data traffic
 
     Result adaptiveIntegrate(int l, int r, Complex x0, Complex x2, Complex lastSum, double TOL, int depth) {
-
-        if (!isWorking) return new Result(1); // Calculation Thread Halted
 
         Complex x1;
 
@@ -958,7 +934,6 @@ public class Expression {
             return new Result(1).append("无法运算 sum 的路径");
         }
         for (v.re = ds; v.re <= de; v.re += 1, cnt++) {
-            if (!isWorking) return new Result(1); // Calculation Thread Halted
 
             v.im = (v.re - ds) * ratio + start.im;
             Result res = value(l, r, v);
@@ -1021,9 +996,6 @@ public class Expression {
             if (!ans.isFinite()) { // invalid value occurred, no need to continue
                 break;
             }
-            if (!isWorking) {
-                return new Complex(); // Calculation Thread Halted
-            }
         }
 
         return ans;
@@ -1061,9 +1033,6 @@ public class Expression {
             }
             if (!ans.isFinite()) { // invalid value occurred, no need to continue
                 break;
-            }
-            if (!isWorking) {
-                return new Complex(); // Calculation Thread Halted
             }
         }
 
@@ -1119,8 +1088,6 @@ public class Expression {
 
     // general limit
     public Result limit(int l, int r, Complex x0) {
-
-        //new Result(-1).append("Evaluator","Function limit() still requires improvement. Results are only for development.",l,r);
 
         // Responsibility recharge
         if (Double.isInfinite(x0.re)) { // to real infinity
@@ -1190,8 +1157,6 @@ public class Expression {
             limitVar += Complex.sub(limitRes[i], limitSum).norm2();
         }
 
-        //Log.i("Limit","Dvar="+limitVar);
-
         Result res = new Result(limitSum);
         if (limitVar > 1E-5) {
             res.append("函数可能没有收敛到预期精度");
@@ -1248,10 +1213,5 @@ public class Expression {
         } else { // found
             return new Result(minRes);
         }
-    }
-
-    // stop evaluation process, can be called asynchronizely
-    public void stopEvaluation() {
-        isWorking = false;
     }
 }

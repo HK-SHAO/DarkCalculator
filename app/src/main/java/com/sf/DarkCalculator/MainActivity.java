@@ -65,7 +65,7 @@ public class MainActivity extends BaseActivity {
     final private String[] operatorVice = {"CLR", "√", "^", "!", "()", "°", "∞", "x"};
 
     final private String[][] function = {
-            {"sqrt", "cbrt", "root", "rand", "randInt", "log", "ln", "logab",
+            {"sqrt", "cbrt", "root", "rand", "randInt", "lg", "ln", "log",
                     "abs", "min", "max", "fact", "sin", "cos", "tan", "asin", "acos",
                     "atan", "sinh", "cosh", "tanh", "asinh", "acosh", "atanh", "recipr",
                     "sum", "re", "im", "arg", "norm", "reg", "conj", "diff", "limit",
@@ -75,7 +75,7 @@ public class MainActivity extends BaseActivity {
             {"ans", "reg", "π", "e", "F", "h", "ћ", "γ", "φ", "c", "N", "R", "k", "G", "Φ", "me", "mn", "mp"}};
 
     final private String[][] functionVice = {
-            {"平方根", "立方根", "开方", "随机复数", "随机整数", "十底对数", "自然对数", "对数",
+            {"平方根", "立方根", "开方", "随机复数", "随机整数", "常用对数", "自然对数", "对数",
                     "绝对值", "最小", "最大", "阶乘", "正弦", "余弦", "正切", "反正弦", "反余弦",
                     "反正切", "双曲正弦", "双曲余弦", "双曲正切", "反双曲正弦", "反双曲余弦",
                     "反双曲正切", "倒数", "累加求和", "实部", "虚部", "辐角", "模长", "寄存",

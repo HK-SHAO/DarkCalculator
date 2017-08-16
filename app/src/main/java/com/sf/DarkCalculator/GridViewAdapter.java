@@ -56,7 +56,6 @@ public class GridViewAdapter extends BaseAdapter {
         convertView = LayoutInflater.from(context).inflate(layoutId, parent, false);
         convertView.setOnClickListener(onClickListener);
         convertView.setOnLongClickListener(onLongClickListener);
-
         GridView.LayoutParams param = new GridView.LayoutParams(
                 ViewGroup.LayoutParams.MATCH_PARENT,
                 gridView.getHeight() / value);
