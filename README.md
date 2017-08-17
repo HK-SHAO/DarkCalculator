@@ -7,7 +7,7 @@
 
 ## 使用的开源项目
 
-险恶计算器的运算核心使用了GitHub上Iraka-C开源的Calci-kernel项目，非常感谢Iraka-C的开源，这使我省去不少的工作。我在此项目的基础上增加了28个函数，另外也在计算效率上做了一些优化。Calci-kernel项目的作者也开发了一款计算器，叫做Calci计算器，大家有兴趣也可以在酷安下载试试这款计算器。
+险恶计算器的运算核心使用了GitHub上Iraka-C开源的Calci-kernel项目，非常感谢Iraka-C的开源，这使我省去不少的工作。我在此项目的基础上增加了近30个函数，另外也在计算效率上做了一些优化。Calci-kernel项目的作者也开发了一款计算器，叫做Calci计算器，大家有兴趣也可以在酷安下载试试这款计算器。
 Calci-kernel开源地址：https://github.com/Iraka-C/Calci-kernel
 
 ## 截图
