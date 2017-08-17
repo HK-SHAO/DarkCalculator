@@ -7,7 +7,7 @@
     android:foreground="?android:attr/selectableItemBackground"
     android:stateListAnimator="@drawable/touch_item">
 
-    <com.sf.DarkCalculator.AutofitTextView
+    <TextView
         android:id="@+id/text_item"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"

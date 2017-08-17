@@ -106,14 +106,31 @@ public class Complex {
     }
 
     public static Complex div(Complex a, Complex b) {
-        double aNorm = a.norm2();
-        double bNorm = b.norm2();
+        double aNorm = a.norm().re;
+        double bNorm = b.norm().re;
         if (aNorm > 0 && bNorm == 0) return Inf; // pInf==nInf in complex field?
-        if (Double.isInfinite(bNorm) && Complex.isDoubleFinite(aNorm))
-            return new Complex(0);
-        double re = (a.re * b.re + a.im * b.im) / bNorm;
-        double im = (a.im * b.re - a.re * b.im) / bNorm;
+        if (Double.isInfinite(bNorm) && Complex.isDoubleFinite(aNorm)) return new Complex(0);
+        double ure = b.re / bNorm; // prevent overflow on a.re*b.re
+        double uim = b.im / bNorm;
+        double re = (a.re * ure + a.im * uim) / bNorm; // prevent overflow on bnorm^2
+        double im = (a.im * ure - a.re * uim) / bNorm;
         return new Complex(re, im);
+    }
+
+    public static Complex pow(Complex a, Complex b) {
+        if (a.re == 0 && a.im == 0) { // special treatment for 0
+            if (b.re > 0) return new Complex(0);
+            else if (b.re < 0 && b.im == 0) return Complex.Inf;
+            else return new Complex();
+        }
+        if (a.norm().re < 1 && b.re == Double.POSITIVE_INFINITY) { // special treatment for inf
+            return new Complex(0);
+        }
+        if (a.norm().re > 1 && b.re == Double.NEGATIVE_INFINITY) { // special treatment for -inf
+            return new Complex(0);
+        }
+
+        return Complex.exp(Complex.mul(b, Complex.ln(a)));
     }
 
     private static String doubleToString(double d) {
@@ -124,13 +141,6 @@ public class Complex {
             return d > 0 ? "∞" : "-∞";
         }
 
-		/*if(Result.precision<15){
-            //return Complex.significand(d,Result.precision);
-			return ParseNumber.toBaseString(d,2,Result.precision);
-		}
-		else{
-			return Double.toString(d);
-		}*/
         if (Result.base == 10 && Result.precision == Result.maxPrecision) {
             return Double.toString(d);
         }
@@ -278,7 +288,7 @@ public class Complex {
 
     public static Complex exp(Complex c) {
         if (c.re == Double.NEGATIVE_INFINITY)
-            return new Complex(0, 0);
+            return new Complex(0);
         double norm = Math.exp(c.re);
         return new Complex(norm * Math.cos(c.im), norm * Math.sin(c.im));
     }
@@ -290,13 +300,14 @@ public class Complex {
     }
 
     public static Complex sqrt(Complex c) {
-        if (c.re == 0) return new Complex(0);
-        double normq = Math.sqrt(c.norm().re);
-        double arg = c.arg().re;
-        double sind2 = Math.sqrt((1 - Math.cos(arg)) / 2);
-        double cosd2 = Math.sqrt((1 + Math.cos(arg)) / 2);
-        if (arg < 0) sind2 = -sind2;
-        return new Complex(normq * cosd2, normq * sind2);
+        double norm = c.norm().re;
+        if (norm == 0) return new Complex(0);
+        double cosArg = c.re / norm; // invalid for 0
+        double sind2 = Math.sqrt((1 - cosArg) / 2);
+        double cosd2 = Math.sqrt((1 + cosArg) / 2);
+        if (c.im < 0) sind2 = -sind2;
+        norm = Math.sqrt(norm);
+        return new Complex(norm * cosd2, norm * sind2);
     }
 
     public static Complex sin(Complex c) {
@@ -352,36 +363,64 @@ public class Complex {
         return new Complex(re_, im_);
     }
 
-    private static double[] gammaP = {
+    private static double[] gammaP = { // constants for Lanczos approximation
             676.5203681218851, -1259.1392167224028, 771.32342877765313,
             -176.61502916214059, 12.507343278686905, -0.13857109526572012,
             9.9843695780195716E-6, 1.5056327351493116E-7
     };
 
-    public static Complex gamma(Complex c) { // Lanczos approximation
+    private static double[] gammaT = { // constants for Taylor approximation
+            -0.57721566490153286, 0.9890559953279725, 0.9074790760808862,
+            0.9817280868344002, 0.9819950689031453, 0.9931491146212761
+    };
 
-        if (c.re >= 142.2152 && Math.abs(c.im) <= 0.001) { // secure to produce complex inf
-            return Complex.Inf;
-        }
+    public static Complex gamma(Complex c) { // Lanczos approximation + Taylor series
+
+        if (c.re == Double.POSITIVE_INFINITY && c.im == 0) return Complex.Inf;
+        //if(c.re==Double.NEGATIVE_INFINITY)return new Complex();
 
         Complex result;
 
-        if (c.re < -310) { // bounded
-            if (c.re == Math.floor(c.re))
-                return Complex.Inf;
-            else
-                return new Complex(0);
-        } else if (c.re < -0.5) { // minus complex plane
+        if (c.re < -310) { // guarantee result in double field
+            if (c.re == Double.NEGATIVE_INFINITY) {
+                if (c.im == 0)
+                    result = new Complex();
+                else
+                    result = new Complex(0);
+
+            } else if (c.re == Math.floor(c.re) && c.im == 0) {
+                result = Complex.Inf;
+            } else {
+                result = new Complex(0);
+            }
+        } else if (c.re < -0.5) { // negative x complex plane
             int k = (int) Math.floor(-c.re) + 1;
             result = Complex.gamma(new Complex(c.re + k, c.im));
             for (int i = k - 1; i >= 0; i--) { // reversed order, prevent 0/0 -> NaN
                 if (!result.isFinite()) break;
                 result = Complex.div(result, new Complex(c.re + i, c.im));
             }
-            return result;
-        } else if (c.re < 0.5) { // Reflection formula
+        } else if (c.re > 142) { // big numbers
+            double kd = Math.ceil(c.re - 142);
+            long k = (long) kd;
+            result = Complex.gamma(new Complex(c.re - kd, c.im));
+            if (result.re != 0 || result.im != 0) {
+                for (long i = 1; i <= k; i++) {
+                    if (!result.isFinite()) break;
+                    result = Complex.mul(result, new Complex(c.re - i, c.im));
+                }
+            }
+        } else if (Math.abs(c.re) < 1E-3 && Math.abs(c.im) < 1E-2) { // Taylor series, deal with value REALLY near the pole 0
+            result = new Complex(0);
+            for (int i = gammaT.length - 1; i >= 0; i--) {
+                result = Complex.mul(result, c);
+                result = new Complex(result.re + gammaT[i], result.im);
+            }
+            result = Complex.add(result, Complex.div(new Complex(1), c));
+        } else if (c.re < 0.5 && Math.abs(c.im) <= 220) { // Reflection formula(more precise), deal with value near the pole 0
             Complex sZ = Complex.sin(Complex.mul(Complex.PI, c));
             Complex gZ = Complex.gamma(Complex.sub(new Complex(1), c));
+            //Log.i("Gamma","sZ="+sZ+" gZ="+gZ);
             result = Complex.div(Complex.PI, Complex.mul(sZ, gZ));
         } else {
             Complex z = new Complex(c.re - 1, c.im);
@@ -398,6 +437,8 @@ public class Complex {
             result = Complex.mul(Complex.exp(Complex.inv(t)), result);
             result = Complex.mul(result, x);
         }
+        if (Double.isInfinite(result.re) && !Complex.isDoubleFinite(result.im))
+            result.im = Double.NaN;
         return result;
     }
 

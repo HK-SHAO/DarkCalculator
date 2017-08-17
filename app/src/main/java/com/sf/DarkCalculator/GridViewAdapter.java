@@ -50,30 +50,44 @@ public class GridViewAdapter extends BaseAdapter {
         return position;
     }
 
+    class ViewHolder {
+        TextView title;
+        TextView vice;
+    }
+
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
+        ViewHolder viewHolder;
+        if (convertView == null) {
+            convertView = LayoutInflater.from(context).inflate(layoutId, parent, false);
+            convertView.setOnClickListener(onClickListener);
+            convertView.setOnLongClickListener(onLongClickListener);
 
-        convertView = LayoutInflater.from(context).inflate(layoutId, parent, false);
-        convertView.setOnClickListener(onClickListener);
-        convertView.setOnLongClickListener(onLongClickListener);
+            viewHolder = new ViewHolder();
+            viewHolder.title = (TextView) convertView.findViewById(R.id.text_item);
+            if (viceText != null)
+                viewHolder.vice = (TextView) convertView.findViewById(R.id.text_vice_item);
+            convertView.setTag(viewHolder);
+        } else {
+            viewHolder = (ViewHolder) convertView.getTag();
+        }
+
+        String text = this.text.get(position);
+        if (text.equals("DEL"))
+            viewHolder.title.setTextSize(24);
+        viewHolder.title.setText(text);
+
+        if (viceText != null) {
+            String text2 = viceText.get(position);
+            if (text2.equals("CLR"))
+                viewHolder.vice.setTextSize(12);
+            viewHolder.vice.setText(text2);
+        }
+
         GridView.LayoutParams param = new GridView.LayoutParams(
                 ViewGroup.LayoutParams.MATCH_PARENT,
                 gridView.getHeight() / value);
         convertView.setLayoutParams(param);
-
-        TextView textView = (TextView) convertView.findViewById(R.id.text_item);
-        String text = this.text.get(position);
-        if (text.equals("DEL"))
-            textView.setTextSize(24);
-        textView.setText(text);
-
-        if (viceText != null) {
-            TextView viceTextView = (TextView) convertView.findViewById(R.id.text_vice_item);
-            String text2 = viceText.get(position);
-            if (text2.equals("CLR"))
-                viceTextView.setTextSize(12);
-            viceTextView.setText(text2);
-        }
 
         return convertView;
     }

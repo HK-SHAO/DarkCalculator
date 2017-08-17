@@ -282,29 +282,13 @@ public class Expression {
         }
 
         // Power (priority right->left)
-        for (
-                int i = l;
-                i <= r; i++)
+        for (int i = l; i <= r; i++)
             if (br[i] == br[l] && text.charAt(i) == '^') {
                 Result r1 = value(l, i - 1, vX);
                 if (r1.isFatalError()) return r1;
                 Result r2 = value(i + 1, r, vX);
                 if (r2.isFatalError()) return r2;
-                Complex t1 = r1.val;
-                Complex t2 = r2.val;
-                if (t1.re == 0 && t1.im == 0) { // special treatment for 0
-                    if (t2.re > 0) return new Result(new Complex(0));
-                    else if (t2.re < 0 && t2.im == 0) return new Result(Complex.Inf);
-                    else return new Result(new Complex(Double.NaN, Double.NaN));
-                }
-                if (t1.norm().re < 1 && t2.re == Double.POSITIVE_INFINITY) { // special treatment for inf
-                    return new Result(new Complex(0));
-                }
-                if (t1.norm().re > 1 && t2.re == Double.NEGATIVE_INFINITY) { // special treatment for -inf
-                    return new Result(new Complex(0));
-                }
-
-                return new Result(Complex.exp(Complex.mul(t2, Complex.ln(t1))));
+                return new Result(Complex.pow(r1.val, r2.val));
             }
 
         // Sqrt symbol
@@ -319,6 +303,11 @@ public class Expression {
             return new Result(1).append("无法计算 “" + s + "”");
         if (text.charAt(l) == '(')
             return value(l + 1, r - 1, vX);
+        return funcValue(l, r, vX);
+    }
+
+    private Result funcValue(int l, int r, Complex vX) {
+        String s = text.substring(l, r + 1);
 
         // Functions
         int listPos; // the Position in Function class
@@ -377,7 +366,7 @@ public class Expression {
         int funcJump = funcID + paramNum;
         switch (funcJump) {
             case Function.ROOT + 2:
-                return new Result(new Complex(Math.pow(val[0].re, 1 / val[1].re)));
+                return new Result(Complex.pow(val[0], new Complex(1 / val[1].re)));
             case Function.REDUC + 1:
                 return new Result(1).append("此函数还未完善");
             case Function.REMN + 2:
@@ -447,9 +436,9 @@ public class Expression {
                 return new Result(Complex.acosh(val[0]));
             case Function.ATANH + 1:
                 return new Result(Complex.atanh(val[0]));
-            case Function.LOG + 1:
+            case Function.LG + 1:
                 return new Result(Complex.log(val[0]));
-            case Function.LOGAB + 2:
+            case Function.LOG + 2:
                 return new Result(Complex.logab(val[0], val[1]));
             case Function.CBRT + 1:
                 return new Result(Complex.cbrt(val[0]));

@@ -28,6 +28,40 @@ public class ParseNumber {
         return digit;
     }
 
+    private static double parseRaw(String s, int base) throws NumberFormatException {
+        int dotPos;
+        for (dotPos = 0; dotPos < s.length(); dotPos++) {
+            if (s.charAt(dotPos) == '.')
+                break;
+        }
+
+        double frac = 0;
+        double digitBase = 1;
+        for (int i = dotPos - 1; i >= 0; i--) {
+            frac += getDigit(s.charAt(i), base) * digitBase;
+            digitBase *= base;
+        }
+        digitBase = 1. / base;
+        for (int i = dotPos + 1; i < s.length(); i++) {
+            frac += getDigit(s.charAt(i), base) * digitBase;
+            digitBase /= base;
+        }
+
+        return frac;
+    }
+
+    public static double parseCompat(String s) throws NumberFormatException {
+        int baseDivSymbolPos = s.indexOf('~');
+        if (baseDivSymbolPos <= 0 || baseDivSymbolPos >= s.length() - 1)
+            throw new NumberFormatException();
+
+        int base = Integer.parseInt(s.substring(baseDivSymbolPos + 1));
+        if (!(base >= 2 && base <= 10 || base == 12 || base == 16)) // base not supported
+            throw new NumberFormatException();
+
+        return parseRaw(s.substring(0, baseDivSymbolPos), base);
+    }
+
     // parse a float number presentation under certain base
     public static double parse(String s) throws NumberFormatException {
 
@@ -40,25 +74,9 @@ public class ParseNumber {
                 break;
             }
         }
-        if (baseSymbolPos == -1) throw new NumberFormatException();
+        if (baseSymbolPos == 0) throw new NumberFormatException();
+        if (baseSymbolPos < 0) return parseCompat(s); // parse the string as a compat format
 
-        int dotPos;
-        for (dotPos = 0; dotPos < baseSymbolPos; dotPos++) {
-            if (s.charAt(dotPos) == '.')
-                break;
-        }
-
-        double frac = 0;
-        double digitBase = 1;
-        for (int i = dotPos - 1; i >= 0; i--) {
-            frac += getDigit(s.charAt(i), base) * digitBase;
-            digitBase *= base;
-        }
-        digitBase = 1. / base;
-        for (int i = dotPos + 1; i < baseSymbolPos; i++) {
-            frac += getDigit(s.charAt(i), base) * digitBase;
-            digitBase /= base;
-        }
 
         int exp;
         if (baseSymbolPos == s.length() - 1) {
@@ -66,6 +84,7 @@ public class ParseNumber {
         } else {
             exp = Integer.parseInt(s.substring(baseSymbolPos + 1));
         }
+        double frac = parseRaw(s.substring(0, baseSymbolPos), base);
 
         return frac * Math.pow(base, exp);
     }

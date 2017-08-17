@@ -41,7 +41,7 @@ class Function {
     static final int BASE = 320;
 
     static final int CBRT = 330;
-    static final int LOG = 340;
+    static final int LG = 340;
     static final int SINH = 350;
     static final int COSH = 360;
     static final int TANH = 370;
@@ -57,7 +57,7 @@ class Function {
     static final int GCD = 480;
     static final int LCM = 490;
     static final int ISODD = 500;
-    static final int LOGAB = 510;
+    static final int LOG = 510;
     static final int SIGN = 520;
     static final int RESTART = 530;
     static final int SETCR = 540;
@@ -123,7 +123,7 @@ class Function {
             new Serial("setBase", BASE),
 
             new Serial("cbrt", CBRT),
-            new Serial("lg", LOG),
+            new Serial("lg", LG),
             new Serial("sinh", SINH),
             new Serial("cosh", COSH),
             new Serial("tanh", TANH),
@@ -139,7 +139,7 @@ class Function {
             new Serial("gcd", GCD),
             new Serial("lcm", LCM),
             new Serial("isOdd", ISODD),
-            new Serial("log", LOGAB),
+            new Serial("log", LOG),
             new Serial("sign", SIGN),
             new Serial("reStart", RESTART),
             new Serial("setCR", SETCR),
@@ -149,6 +149,6 @@ class Function {
             new Serial("toRAD", TORAD),
             new Serial("remn", REMN),
             new Serial("reduc", REDUC),
-            new Serial("root", ROOT),
+            new Serial("root", ROOT)
     };
 }
