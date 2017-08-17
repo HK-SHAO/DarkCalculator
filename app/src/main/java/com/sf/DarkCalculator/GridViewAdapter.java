@@ -5,12 +5,10 @@ import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AbsListView;
 import android.widget.BaseAdapter;
 import android.widget.GridView;
 import android.widget.TextView;
 
-import java.util.ArrayList;
 import java.util.List;
 
 public class GridViewAdapter extends BaseAdapter {
@@ -19,19 +17,15 @@ public class GridViewAdapter extends BaseAdapter {
     private List<String> text;
     private List<String> viceText;
     private GridView gridView;
-    private View.OnClickListener onClickListener;
-    private View.OnLongClickListener onLongClickListener;
     private int layoutId;
     private int value = 4;
 
-    public GridViewAdapter(Context context, GridView gridView, List<String> text, int layoutId,
-                           View.OnClickListener onClickListener) {
+    public GridViewAdapter(Context context, GridView gridView, List<String> text, int layoutId) {
         super();
         this.context = context;
         this.text = text;
         this.gridView = gridView;
         this.layoutId = layoutId;
-        this.onClickListener = onClickListener;
     }
 
     @Override
@@ -50,7 +44,7 @@ public class GridViewAdapter extends BaseAdapter {
         return position;
     }
 
-    class ViewHolder {
+    private class ViewHolder {
         TextView title;
         TextView vice;
     }
@@ -58,18 +52,17 @@ public class GridViewAdapter extends BaseAdapter {
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
         ViewHolder viewHolder;
+        View view;
         if (convertView == null) {
-            convertView = LayoutInflater.from(context).inflate(layoutId, parent, false);
-            convertView.setOnClickListener(onClickListener);
-            convertView.setOnLongClickListener(onLongClickListener);
-
+            view = LayoutInflater.from(context).inflate(layoutId, parent, false);
             viewHolder = new ViewHolder();
-            viewHolder.title = (TextView) convertView.findViewById(R.id.text_item);
+            viewHolder.title = (TextView) view.findViewById(R.id.text_item);
             if (viceText != null)
-                viewHolder.vice = (TextView) convertView.findViewById(R.id.text_vice_item);
-            convertView.setTag(viewHolder);
+                viewHolder.vice = (TextView) view.findViewById(R.id.text_vice_item);
+            view.setTag(viewHolder);
         } else {
-            viewHolder = (ViewHolder) convertView.getTag();
+            view = convertView;
+            viewHolder = (ViewHolder) view.getTag();
         }
 
         String text = this.text.get(position);
@@ -87,9 +80,9 @@ public class GridViewAdapter extends BaseAdapter {
         GridView.LayoutParams param = new GridView.LayoutParams(
                 ViewGroup.LayoutParams.MATCH_PARENT,
                 gridView.getHeight() / value);
-        convertView.setLayoutParams(param);
+        view.setLayoutParams(param);
 
-        return convertView;
+        return view;
     }
 
     public void setViceText(List<String> list) {
@@ -99,9 +92,5 @@ public class GridViewAdapter extends BaseAdapter {
     public void setValue(int value) {
         this.value = value;
         notifyDataSetChanged();
-    }
-
-    public void setOnLongClickListener(View.OnLongClickListener onLongClickListener) {
-        this.onLongClickListener = onLongClickListener;
     }
 }

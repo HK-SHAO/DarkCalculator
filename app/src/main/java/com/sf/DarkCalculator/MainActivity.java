@@ -23,6 +23,7 @@ import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.WindowManager;
+import android.widget.AdapterView;
 import android.widget.EditText;
 import android.widget.GridView;
 import android.widget.TextView;
@@ -196,10 +197,10 @@ public class MainActivity extends BaseActivity {
     private void initSideBar() {
         final GridView sideBar = (GridView) findViewById(R.id.sideBar);
         barView.add(sideBar);
-        GridViewAdapter sideBarAdapter = new GridViewAdapter(this, sideBar, Arrays.asList(functionList), R.layout.button_sidebar, new View.OnClickListener() {
+        sideBar.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
-            public void onClick(View v) {
-                TextView textView = (TextView) v.findViewById(R.id.text_item);
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                TextView textView = (TextView) view.findViewById(R.id.text_item);
                 String text = textView.getText().toString();
                 int i = 0;
                 for (String str : functionList) {
@@ -225,6 +226,7 @@ public class MainActivity extends BaseActivity {
                 drawer.closeDrawer(GravityCompat.START);
             }
         });
+        GridViewAdapter sideBarAdapter = new GridViewAdapter(this, sideBar, Arrays.asList(functionList), R.layout.button_sidebar);
         barAdapter.add(sideBarAdapter);
         sideBar.setAdapter(sideBarAdapter);
     }
@@ -308,13 +310,12 @@ public class MainActivity extends BaseActivity {
             GridView operatorProBar = (GridView) view;
             barView.add(operatorProBar);
             final String s = i == 0 ? "()" : "";
-            int id = i == 0 ? R.layout.button_function : R.layout.button_constant;
-            GridViewAdapter operatorProAdapter = new GridViewAdapter(this, operatorProBar, Arrays.asList(function[i++]), id, new View.OnClickListener() {
+            operatorProBar.setOnItemClickListener(new AdapterView.OnItemClickListener() {
                 @Override
-                public void onClick(View v) {
-                    String str = ((TextView) v.findViewById(R.id.text_item)).getText().toString();
+                public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                    String str = ((TextView) view.findViewById(R.id.text_item)).getText().toString();
                     if (str.equals("reduc")) {
-                        Snackbar.make(v, "此函数还未完善", Snackbar.LENGTH_SHORT).show();
+                        Snackbar.make(view, "此函数还未完善", Snackbar.LENGTH_SHORT).show();
                         return;
                     }
                     Editable editable = editText.getText();
@@ -324,6 +325,8 @@ public class MainActivity extends BaseActivity {
                         editText.setSelection(index + str.length() + s.length() - 1);
                 }
             });
+            int id = i == 0 ? R.layout.button_function : R.layout.button_constant;
+            GridViewAdapter operatorProAdapter = new GridViewAdapter(this, operatorProBar, Arrays.asList(function[i++]), id);
             operatorProAdapter.setViceText(Arrays.asList(functionVice[i - 1]));
 
             barAdapter.add(operatorProAdapter);
@@ -334,10 +337,10 @@ public class MainActivity extends BaseActivity {
     private void initOperator() {
         GridView operatorBar = (GridView) findViewById(R.id.bar_operator);
         barView.add(operatorBar);
-        GridViewAdapter operatorAdapter = new GridViewAdapter(this, operatorBar, Arrays.asList(operator), R.layout.button_operator, new View.OnClickListener() {
+        operatorBar.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
-            public void onClick(View v) {
-                String str = ((TextView) v.findViewById(R.id.text_item)).getText().toString();
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                String str = ((TextView) view.findViewById(R.id.text_item)).getText().toString();
                 Editable editable = editText.getText();
                 int index = editText.getSelectionStart();
                 if (str.equals("DEL")) {
@@ -350,12 +353,10 @@ public class MainActivity extends BaseActivity {
                 editable.insert(index, str);
             }
         });
-        barAdapter.add(operatorAdapter);
-        operatorAdapter.setViceText(Arrays.asList(operatorVice));
-        operatorAdapter.setOnLongClickListener(new View.OnLongClickListener() {
+        operatorBar.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
             @Override
-            public boolean onLongClick(View v) {
-                String str = ((TextView) v.findViewById(R.id.text_vice_item)).getText().toString();
+            public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
+                String str = ((TextView) view.findViewById(R.id.text_vice_item)).getText().toString();
                 if (str.equals("CLR")) {
                     editText.setText(null);
                     return true;
@@ -367,6 +368,9 @@ public class MainActivity extends BaseActivity {
                 return true;
             }
         });
+        GridViewAdapter operatorAdapter = new GridViewAdapter(this, operatorBar, Arrays.asList(operator), R.layout.button_operator);
+        barAdapter.add(operatorAdapter);
+        operatorAdapter.setViceText(Arrays.asList(operatorVice));
         operatorBar.setAdapter(operatorAdapter);
     }
 
@@ -376,14 +380,14 @@ public class MainActivity extends BaseActivity {
                     "⑵", "⑶", "⑷", "E", "⑸", "⑹", "⑺", "F", "⑻", "⑼", "⑽", "⑾", "⑿", "⒀", "⒁", "⒂", "⒃"};
         GridView numericBar = (GridView) findViewById(R.id.bar_numeric);
         barView.add(numericBar);
-        GridViewAdapter numericAdapter = new GridViewAdapter(this, numericBar, Arrays.asList(numeric), R.layout.button_numeric, new View.OnClickListener() {
+        numericBar.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
-            public void onClick(View v) {
-                String str = ((TextView) v.findViewById(R.id.text_item)).getText().toString();
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                String str = ((TextView) view.findViewById(R.id.text_item)).getText().toString();
                 int index = editText.getSelectionStart();
                 if (str.equals("=")) {
                     if (calcThread != null) {
-                        Snackbar.make(v, "请等待运算完成", Snackbar.LENGTH_SHORT).show();
+                        Snackbar.make(view, "请等待运算完成", Snackbar.LENGTH_SHORT).show();
                         return;
                     }
                     stateText.setText("运算中...");
@@ -422,6 +426,7 @@ public class MainActivity extends BaseActivity {
                 editText.getText().insert(index, str);
             }
         });
+        GridViewAdapter numericAdapter = new GridViewAdapter(this, numericBar, Arrays.asList(numeric), R.layout.button_numeric);
         barAdapter.add(numericAdapter);
         numericBar.setAdapter(numericAdapter);
     }
