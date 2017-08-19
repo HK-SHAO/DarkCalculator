@@ -13,7 +13,6 @@
         android:layout_gravity="center_vertical"
         android:fontFamily="sans-serif-light"
         android:paddingLeft="24dp"
-        android:singleLine="true"
         android:textColor="#424242"
         android:textSize="22sp" />
 

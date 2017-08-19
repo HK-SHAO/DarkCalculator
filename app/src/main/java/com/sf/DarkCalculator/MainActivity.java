@@ -12,6 +12,7 @@ import android.support.design.widget.TabLayout;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.view.ViewPager;
 import android.support.v4.widget.DrawerLayout;
+import android.support.v7.app.ActionBar;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.Toolbar;
 import android.text.Editable;
@@ -51,7 +52,7 @@ import java.util.regex.Pattern;
 public class MainActivity extends BaseActivity {
 
     public static MainActivity activity;
-    public static int screenOrient;
+    private int screenOrient;
     private Context context;
     private Toolbar toolbar;
     private EditText editText;
@@ -99,8 +100,6 @@ public class MainActivity extends BaseActivity {
         activity = this;
         context = this;
         screenOrient = getScreenOrient(this);
-        barAdapter.removeAll(barAdapter);
-        barView.removeAll(barView);
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         initKeyWords();
@@ -115,8 +114,6 @@ public class MainActivity extends BaseActivity {
         initOperator();
         initOperatorPro();
         initCR();
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        getSupportActionBar().setHomeAsUpIndicator(R.drawable.ic_menu);
     }
 
     private void initCR() {
@@ -156,11 +153,12 @@ public class MainActivity extends BaseActivity {
 
     private void initKeyWords() {
         StringBuffer sb = new StringBuffer();
-        sb.append("(");
+        sb.append("(\\d+|\\b)(");
         for (String[] array : function)
             for (String str : array) {
                 sb.append(str + "|");
             }
+        sb.deleteCharAt(sb.length() - 1);
         sb.append(")\\b");
         keywords = Pattern.compile(sb.toString());
     }
@@ -268,8 +266,8 @@ public class MainActivity extends BaseActivity {
 
     }
 
-    public static ArrayList<GridView> barView = new ArrayList<>();
-    public static ArrayList<GridViewAdapter> barAdapter = new ArrayList<>();
+    private ArrayList<GridView> barView = new ArrayList<>();
+    private ArrayList<GridViewAdapter> barAdapter = new ArrayList<>();
 
     public void setBarCR(final int x, final int y, final int z) {
         SharedPreferences.Editor editor = preferences.edit();
@@ -307,20 +305,21 @@ public class MainActivity extends BaseActivity {
                         editText.setSelection(index + str.length() + s.length() - 1);
                 }
             });
-            operatorProBar.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
-                @Override
-                public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
-                    if (helpUtil == null)
-                        helpUtil = new HelpUtil();
-                    String text = ((TextView) view.findViewById(R.id.text_item)).getText().toString();
-                    AlertDialog.Builder dialog = new AlertDialog.Builder(MainActivity.this);
-                    dialog.setTitle(text);
-                    dialog.setMessage(helpUtil.getHelpText(text));
-                    dialog.setPositiveButton("确定", null);
-                    dialog.show();
-                    return true;
-                }
-            });
+            if (i == 0)
+                operatorProBar.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
+                    @Override
+                    public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
+                        if (helpUtil == null)
+                            helpUtil = new HelpUtil();
+                        String text = ((TextView) view.findViewById(R.id.text_item)).getText().toString();
+                        AlertDialog.Builder dialog = new AlertDialog.Builder(MainActivity.this);
+                        dialog.setTitle(text);
+                        dialog.setMessage(helpUtil.getHelpText(text));
+                        dialog.setPositiveButton("确定", null);
+                        dialog.show();
+                        return true;
+                    }
+                });
             int id = i == 0 ? R.layout.button_function : R.layout.button_constant;
             GridViewAdapter operatorProAdapter = new GridViewAdapter(this, operatorProBar, Arrays.asList(function[i++]), id);
             operatorProAdapter.setViceText(Arrays.asList(functionVice[i - 1]));
@@ -400,7 +399,7 @@ public class MainActivity extends BaseActivity {
                                         out.setTextColor(0xffff4081);
                                         out.setText(value[0]);
                                     } else {
-                                        out.setTextColor(0xffeeeeee);
+                                        out.setTextColor(0xffbdbdbd);
                                         Constants.constants.set(0, new String[]{"ans", value[0]});
                                         if (value[0].getBytes().length > 1000) {
                                             out.setText("数值太大，请长按此处显示结果");
@@ -443,8 +442,6 @@ public class MainActivity extends BaseActivity {
         } catch (Exception e) {
         }
         AutofitHelper.create(editText).setMinTextSize(28);
-        editText.setFocusable(true);
-        editText.setFocusableInTouchMode(true);
         editText.requestFocus();
         editText.requestFocusFromTouch();
 
@@ -458,7 +455,7 @@ public class MainActivity extends BaseActivity {
             public void onTextChanged(final CharSequence s, int start, int before, int count) {
                 if (s.length() == 0) {
                     stateText.setText(null);
-                    out.setTextColor(0xffeeeeee);
+                    out.setTextColor(0xffbdbdbd);
                     out.setText("···");
                     return;
                 }
@@ -472,7 +469,7 @@ public class MainActivity extends BaseActivity {
                             runOnUiThread(new Runnable() {
                                 @Override
                                 public void run() {
-                                    out.setTextColor(0xffeeeeee);
+                                    out.setTextColor(0xffbdbdbd);
                                     stateText.setText("运算结束，耗时 " + (System.currentTimeMillis() - t) + " 毫秒");
                                     if (value[0].getBytes().length > 1000) {
                                         out.setText("数值太大，请长按此处显示结果");
@@ -494,20 +491,22 @@ public class MainActivity extends BaseActivity {
                     return;
                 }
                 selection = editText.getSelectionEnd();
-                modified = false;
                 ForegroundColorSpan spans[] = s.getSpans(0, s.length(), ForegroundColorSpan.class);
-
                 for (int n = spans.length; n-- > 0; )
                     s.removeSpan(spans[n]);
-                for (Matcher m = Pattern.compile("[°∞xi]").matcher(s); m.find(); )
+
+                for (Matcher m = keywords.matcher(s); m.find(); )
+                    s.setSpan(new ForegroundColorSpan(0xffa5d6a7), m.start(), m.end(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+                for (Matcher m = Pattern.compile("\\d*").matcher(s); m.find(); )
+                    s.setSpan(new ForegroundColorSpan(0xffeeeeee), m.start(), m.end(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+                for (Matcher m = Pattern.compile("\\b[°∞xi]\\b").matcher(s); m.find(); )
                     s.setSpan(new ForegroundColorSpan(0xfff48fb1), m.start(), m.end(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
                 for (Matcher m = Pattern.compile("[\\p{P}+^=÷×√]").matcher(s); m.find(); )
                     s.setSpan(new ForegroundColorSpan(0xff81d4fa), m.start(), m.end(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
-                for (Matcher m = keywords.matcher(s); m.find(); )
-                    s.setSpan(new ForegroundColorSpan(0xffa5d6a7), m.start(), m.end(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+                modified = false;
                 editText.setText(s);
-                editText.setSelection(selection);
                 modified = true;
+                editText.setSelection(selection);
             }
         });
     }
@@ -517,6 +516,9 @@ public class MainActivity extends BaseActivity {
         setSupportActionBar(toolbar);
         setTitle(null);
         toolbar.setSubtitle("科学计算");
+        ActionBar actionBar = getSupportActionBar();
+        actionBar.setDisplayHomeAsUpEnabled(true);
+        actionBar.setHomeAsUpIndicator(R.drawable.ic_menu);
     }
 
     @Override

@@ -39,7 +39,6 @@
                 android:inputType="textNoSuggestions"
                 android:paddingLeft="16dp"
                 android:paddingRight="16dp"
-                android:singleLine="true"
                 android:textColor="#eeeeee"
                 android:textCursorDrawable="@drawable/cursor"
                 android:textSize="66sp" />
@@ -60,6 +59,7 @@
                     android:paddingRight="16dp"
                     android:singleLine="true"
                     android:text="···"
+                    android:textColor="#bdbdbd"
                     android:textSize="48sp" />
 
             </HorizontalScrollView>

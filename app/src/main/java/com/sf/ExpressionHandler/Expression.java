@@ -198,7 +198,6 @@ public class Expression {
         }
 
         char ci;
-        char cj;
 
         // Addition and Subtraction
         for (int i = r; i > l; i--) {

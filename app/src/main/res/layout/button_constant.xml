@@ -12,7 +12,6 @@
         android:layout_height="wrap_content"
         android:layout_gravity="center"
         android:fontFamily="sans-serif-light"
-        android:singleLine="true"
         android:textColor="#212121"
         android:textSize="32sp" />
 
