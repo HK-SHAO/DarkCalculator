@@ -17,7 +17,7 @@ public class ExpressionHandler {
             String val = r.val.toString();
             value = new String[]{val, "" + isError};
         } catch (Exception e) {
-            value = new String[]{"表达式语法错误", "true"};
+            value = new String[]{"···", "true"};
         }
         return value;
     }

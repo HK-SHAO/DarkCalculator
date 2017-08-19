@@ -12,6 +12,7 @@ import android.support.design.widget.TabLayout;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.view.ViewPager;
 import android.support.v4.widget.DrawerLayout;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.Toolbar;
 import android.text.Editable;
 import android.text.Spannable;
@@ -20,7 +21,6 @@ import android.text.style.ForegroundColorSpan;
 import android.view.Display;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.MotionEvent;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.AdapterView;
@@ -61,6 +61,7 @@ public class MainActivity extends BaseActivity {
     private DrawerLayout drawer;
     private ArrayList<View> drawerPageList;
 
+    private HelpUtil helpUtil;
     private Pattern keywords;
     final private String[] operator = {"DEL", "÷", "×", "-", "+", "%", ",", "i"};
     final private String[] operatorVice = {"CLR", "√", "^", "!", "()", "°", "∞", "x"};
@@ -79,7 +80,7 @@ public class MainActivity extends BaseActivity {
             {"平方根", "立方根", "开方", "随机复数", "随机整数", "常用对数", "自然对数", "对数",
                     "绝对值", "最小", "最大", "阶乘", "正弦", "余弦", "正切", "反正弦", "反余弦",
                     "反正切", "双曲正弦", "双曲余弦", "双曲正切", "反双曲正弦", "反双曲余弦",
-                    "反双曲正切", "倒数", "累加求和", "实部", "虚部", "辐角", "模长", "寄存",
+                    "反双曲正切", "倒数", "累加求和", "实部", "虚部", "辐角", "范数", "寄存",
                     "共轭复数", "导函数", "极限", "求值", "函数零点", "定积分", "e底指数",
                     "最大公约", "最小公倍", "排列", "组合", "四舍五入", "向下取整", "向上取整",
                     "取正负号", "伽玛函数", "取余", "分数化简", "质数", "判断质数", "判断奇数",
@@ -155,7 +156,7 @@ public class MainActivity extends BaseActivity {
 
     private void initKeyWords() {
         StringBuffer sb = new StringBuffer();
-        sb.append("\\b(");
+        sb.append("(");
         for (String[] array : function)
             for (String str : array) {
                 sb.append(str + "|");
@@ -200,24 +201,16 @@ public class MainActivity extends BaseActivity {
         sideBar.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                TextView textView = (TextView) view.findViewById(R.id.text_item);
-                String text = textView.getText().toString();
-                int i = 0;
-                for (String str : functionList) {
-                    i++;
-                    if (text.equals(str))
+                switch (position) {
+                    case 0:
                         break;
-                }
-                switch (i) {
                     case 1:
-                        break;
-                    case 2:
                         BigDecimalActivity.actionStart(context);
                         break;
-                    case 4:
+                    case 3:
                         BaseConversionActivity.actionStart(context);
                         break;
-                    case 8:
+                    case 7:
                         CapitalMoneyActivity.actionStart(context);
                         break;
                     default:
@@ -233,16 +226,6 @@ public class MainActivity extends BaseActivity {
 
     private void initDrawer() {
         drawer = (DrawerLayout) findViewById(R.id.drawer_main);
-        drawer.setOnTouchListener(new View.OnTouchListener() {
-            @Override
-            public boolean onTouch(View v, MotionEvent event) {
-                if (event.getAction() == MotionEvent.ACTION_DOWN) {
-                    drawer.setDrawerLockMode(DrawerLayout.LOCK_MODE_UNLOCKED);
-                    drawer.closeDrawers();
-                }
-                return false;
-            }
-        });
     }
 
     private void initTabs() {
@@ -271,10 +254,9 @@ public class MainActivity extends BaseActivity {
             @Override
             public void onPageSelected(int position) {
                 if (position == 0) {
-                    drawer.setDrawerLockMode(DrawerLayout.LOCK_MODE_UNLOCKED);
+                    drawer.setDrawerLockMode(DrawerLayout.LOCK_MODE_UNLOCKED, GravityCompat.END);
                 } else {
-                    drawer.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED);
-                    drawer.openDrawer(GravityCompat.END);
+                    drawer.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_OPEN, GravityCompat.END);
                 }
             }
 
@@ -323,6 +305,20 @@ public class MainActivity extends BaseActivity {
                     editable.insert(index, str + s);
                     if (s.length() != 0)
                         editText.setSelection(index + str.length() + s.length() - 1);
+                }
+            });
+            operatorProBar.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
+                @Override
+                public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
+                    if (helpUtil == null)
+                        helpUtil = new HelpUtil();
+                    String text = ((TextView) view.findViewById(R.id.text_item)).getText().toString();
+                    AlertDialog.Builder dialog = new AlertDialog.Builder(MainActivity.this);
+                    dialog.setTitle(text);
+                    dialog.setMessage(helpUtil.getHelpText(text));
+                    dialog.setPositiveButton("确定", null);
+                    dialog.show();
+                    return true;
                 }
             });
             int id = i == 0 ? R.layout.button_function : R.layout.button_constant;
@@ -412,8 +408,8 @@ public class MainActivity extends BaseActivity {
                                         } else
                                             out.setText(value[0]);
                                     }
-                                    calcThread = null;
                                     rootValue = value[0];
+                                    calcThread = null;
                                 }
                             });
                         }
@@ -421,7 +417,6 @@ public class MainActivity extends BaseActivity {
                     calcThread.start();
                     return;
                 }
-
                 str = str.equals("·") ? "." : str;
                 editText.getText().insert(index, str);
             }
@@ -463,6 +458,7 @@ public class MainActivity extends BaseActivity {
             public void onTextChanged(final CharSequence s, int start, int before, int count) {
                 if (s.length() == 0) {
                     stateText.setText(null);
+                    out.setTextColor(0xffeeeeee);
                     out.setText("···");
                     return;
                 }
@@ -478,14 +474,12 @@ public class MainActivity extends BaseActivity {
                                 public void run() {
                                     out.setTextColor(0xffeeeeee);
                                     stateText.setText("运算结束，耗时 " + (System.currentTimeMillis() - t) + " 毫秒");
-                                    if (value[0].equals("表达式语法错误")) {
-                                        out.setText("···");
-                                    } else if (value[0].getBytes().length > 1000) {
+                                    if (value[0].getBytes().length > 1000) {
                                         out.setText("数值太大，请长按此处显示结果");
                                     } else
                                         out.setText(value[0]);
-                                    calcThread = null;
                                     rootValue = value[0];
+                                    calcThread = null;
                                 }
                             });
                         }
@@ -505,6 +499,8 @@ public class MainActivity extends BaseActivity {
 
                 for (int n = spans.length; n-- > 0; )
                     s.removeSpan(spans[n]);
+                for (Matcher m = Pattern.compile("[°∞xi]").matcher(s); m.find(); )
+                    s.setSpan(new ForegroundColorSpan(0xfff48fb1), m.start(), m.end(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
                 for (Matcher m = Pattern.compile("[\\p{P}+^=÷×√]").matcher(s); m.find(); )
                     s.setSpan(new ForegroundColorSpan(0xff81d4fa), m.start(), m.end(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
                 for (Matcher m = keywords.matcher(s); m.find(); )
@@ -525,6 +521,17 @@ public class MainActivity extends BaseActivity {
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
+        menu.add("帮助").setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
+            @Override
+            public boolean onMenuItemClick(MenuItem item) {
+                AlertDialog.Builder dialog = new AlertDialog.Builder(MainActivity.this);
+                dialog.setTitle("帮助");
+                dialog.setMessage("函数的使用帮助可以长按对应的函数按钮查看");
+                dialog.setPositiveButton("确定", null);
+                dialog.show();
+                return true;
+            }
+        });
         menu.add("关于").setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
             @Override
             public boolean onMenuItemClick(MenuItem item) {
@@ -545,10 +552,10 @@ public class MainActivity extends BaseActivity {
     @Override
     public void onBackPressed() {
         if (drawer.isDrawerOpen(GravityCompat.END)) {
+            drawer.setDrawerLockMode(DrawerLayout.LOCK_MODE_UNLOCKED, GravityCompat.END);
             drawer.closeDrawer(GravityCompat.END);
             return;
-        }
-        if (drawer.isDrawerOpen(GravityCompat.START)) {
+        } else if (drawer.isDrawerOpen(GravityCompat.START)) {
             drawer.closeDrawer(GravityCompat.START);
             return;
         }
@@ -559,8 +566,10 @@ public class MainActivity extends BaseActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case android.R.id.home:
-                if (drawer.isDrawerOpen(GravityCompat.END))
+                if (drawer.isDrawerOpen(GravityCompat.END)) {
+                    drawer.setDrawerLockMode(DrawerLayout.LOCK_MODE_UNLOCKED, GravityCompat.END);
                     drawer.closeDrawer(GravityCompat.END);
+                }
                 if (drawer.isDrawerOpen(GravityCompat.START))
                     drawer.closeDrawer(GravityCompat.START);
                 else

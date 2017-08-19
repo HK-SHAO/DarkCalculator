@@ -10,7 +10,6 @@ import android.view.MenuItem;
 
 public class BaseActivity extends AppCompatActivity {
 
-
     public static SharedPreferences preferences;
 
     @Override

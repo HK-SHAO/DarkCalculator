@@ -190,7 +190,7 @@ public class Complex {
     //======================= Complex Functions ============================
 
     public static Complex logab(Complex c, Complex c2) {
-        return new Complex(log(c).re / log(c2).re);
+        return new Complex(log(c2).re / log(c).re);
     }
 
     public static boolean isOdd(Complex c) {

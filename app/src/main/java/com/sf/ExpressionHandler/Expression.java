@@ -344,13 +344,11 @@ public class Expression {
 
         // Too many param.
         if (paramNum > 9)
-            return new Result(1).append("函数 “" + Function.funcList[listPos].funcName + "” 参数过多");
+            return new Result(1).append("函数 “" + Function.funcList[listPos].funcName + "” 参数错误");
 
         // Calculate each param. value
         Complex[] val = new Complex[10];
-        if (paramNum > 0)
-
-        {
+        if (paramNum > 0) {
             for (int p = leftBr, i = 0; nextFS[p] >= 0; p = nextFS[p], i++) {
                 if (i >= exprParamNum) {
                     int resl = p + 1;
@@ -527,9 +525,9 @@ public class Expression {
             case Function.PREC + 1:
                 int prec = (int) Math.round(val[0].re);
                 if (prec < 0)
-                    return new Result(1).setVal(new Complex(-1)).append("精度过低");
+                    return new Result(1).setVal(new Complex(1)).append("精度过低");
                 if (prec > Result.maxPrecision)
-                    return new Result(1).setVal(new Complex(-1))
+                    return new Result(1).setVal(new Complex(1))
                             .append("设置的精度过高，最大精度是 " + Result.maxPrecision + " 位小数");
                 Result.precision = prec;
                 return new Result(0).append("精度设置为 " + prec + " 位小数");
@@ -539,16 +537,16 @@ public class Expression {
             case Function.BASE + 1:
                 int base = (int) Math.round(val[0].re);
                 if (!(base >= 2 && base <= 10 || base == 12 || base == 16))
-                    return new Result(1).setVal(new Complex(1)).append("base函数的参数参数无效");
+                    return new Result(1).setVal(new Complex(1)).append("函数的参数无效");
                 Result.setBase(base);
                 return new Result(0).append("输出进制被设置为 " + base + " 进制，" + "精度为 " + Result.precision + " 位小数");
             case Function.BASE + 2:
                 base = (int) Math.round(val[1].re);
                 if (!(base >= 2 && base <= 10 || base == 12 || base == 16))
-                    return new Result(1).setVal(new Complex(1)).append("base函数的参数参数无效");
+                    return new Result(1).setVal(new Complex(1)).append("函数的参数无效");
                 return new Result(new Complex(ParseNumber.toBaseString(val[0].re, base, Result.precision)));
         }
-        return new Result(1).append("函数 " + Function.funcList[listPos].funcName + " 参数错误");
+        return new Result(1).append("函数 “" + Function.funcList[listPos].funcName + "” 参数错误");
     }
 
     private boolean isOmitMult(int p) {
@@ -914,7 +912,6 @@ public class Expression {
         Complex v = new Complex(0);
         final double TOL2 = 1E-16; // 8 digits expected
         final int maxBoundCnt = 1000;
-        final int maxCnt = 100000;
         int boundCnt = 0;
         int cnt = 0;
 
@@ -943,10 +940,6 @@ public class Expression {
                 if (boundCnt > maxBoundCnt) {
                     break;
                 }
-            }
-
-            if (cnt == maxCnt) {
-                new Result(1).append("运算耗时过长");
             }
 
             sum = Complex.add(sum, res.val);

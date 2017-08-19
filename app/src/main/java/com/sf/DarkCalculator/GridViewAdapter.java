@@ -21,7 +21,6 @@ public class GridViewAdapter extends BaseAdapter {
     private int value = 4;
 
     public GridViewAdapter(Context context, GridView gridView, List<String> text, int layoutId) {
-        super();
         this.context = context;
         this.text = text;
         this.gridView = gridView;
