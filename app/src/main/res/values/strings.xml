@@ -1,4 +1,30 @@
 <resources>
     <string name="app_name">险恶计算器</string>
-    <string name="app_about">这是烧风用Android Studio开发的第二个作品，马上要开学了，很多坑却还没填完，只好硬着头皮提前上架了，大家见谅。\n\n这是一款兼容性高，功能强大，拥有近60个函数，支持复数运算和解方程并且开源的科学计算器，另外还添加了进制转换，大数运算，大写数字等功能。虽然还没有完善，但我会在上学的过程中利用业余时间继续完善它的。\n\n险恶计算器的运算核心使用了GitHub上Iraka-C开源的Calci-kernel项目，非常感谢Iraka-C的开源，这使我省去不少的工作。我在此项目的基础上增加了近30个函数，另外也在计算效率上做了一些优化。Calci-kernel项目的作者也开发了一款计算器，叫做Calci计算器，大家有兴趣也可以在酷安下载试试这款计算器。\n\n险恶计算器开源地址：https://github.com/HK-SHAO/DarkCalculator\n\nCalci-kernel开源地址：https://github.com/Iraka-C/Calci-kernel</string>
+    <string name="app_about">这是烧风用Android Studio开发的第二个作品，马上要开学了，很多坑却还没填完，只好硬着头皮提前上架了，大家见谅。\n
+\n
+这是一款兼容性高，功能强大，拥有近60个函数，支持复数运算和解方程并且开源的科学计算器，另外还添加了进制转换，大数运算，大写数字等功能。虽然还没有完善，但我会在上学的过程中利用业余时间继续完善它的。\n
+\n
+险恶计算器的运算核心使用了GitHub上Iraka-C开源的Calci-kernel项目，非常感谢Iraka-C的开源，这使我省去不少的工作。我在此项目的基础上增加了近30个函数，另外也在计算效率上做了一些优化。Calci-kernel项目的作者也开发了一款计算器，叫做Calci计算器，大家有兴趣也可以在酷安下载试试这款计算器。\n
+\n
+险恶计算器开源地址：https://github.com/HK-SHAO/DarkCalculator\n
+\n
+Calci-kernel开源地址：https://github.com/Iraka-C/Calci-kernel</string>
+
+    <string name="app_help">功能区：\n
+点击左上角按钮即可打开功能区，你也可以在界面左侧向右滑动来打开功能区\n
+\n
+符号栏：\n
+点击相应的符号按钮插入符号，长按符号按钮可插入右上角显示的符号\n
+\n
+函数和常数：\n
+界面右侧向左滑动即可打开函数和常数的界面\n
+\n
+更多的数字与符号：\n
+界面中所有的的按钮区均可向上滑动以显示更多的按钮\n
+\n
+如何表示其它进制的数：\n
+使用⑵⑶⑷等符号放置到数的末尾来标识数的进制即可运算，标识一个16进制的数的例子：FFABC⒃\n
+\n
+函数的使用方法：\n
+函数的使用方法可以长按对应的函数按钮查看</string>
 </resources>

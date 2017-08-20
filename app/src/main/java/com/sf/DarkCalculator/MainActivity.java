@@ -52,7 +52,6 @@ import java.util.regex.Pattern;
 public class MainActivity extends BaseActivity {
 
     public static MainActivity activity;
-    private int screenOrient;
     private Context context;
     private Toolbar toolbar;
     private EditText editText;
@@ -92,14 +91,13 @@ public class MainActivity extends BaseActivity {
     final private String[] functionList = {"科学计算", "大数计算", "时间计算", "进制转换",
             "方程式配平", "分子量计算", "亲戚关系计算", "大写数字", "汇率转换", "单位转换"};
 
-    private String[] numeric = {"7", "8", "9", "4", "5", "6", "1", "2", "3", "·", "0", "=", "A", "B", "C", "D", "E", "F",
+    final private String[] numeric = {"7", "8", "9", "4", "5", "6", "1", "2", "3", "·", "0", "=", "A", "B", "C", "D", "E", "F",
             "⑵", "⑶", "⑷", "⑸", "⑹", "⑺", "⑻", "⑼", "⑽", "⑾", "⑿", "⒀", "⒁", "⒂", "⒃"};
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         activity = this;
         context = this;
-        screenOrient = getScreenOrient(this);
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         initKeyWords();
@@ -117,26 +115,13 @@ public class MainActivity extends BaseActivity {
     }
 
     private void initCR() {
-        if (screenOrient == ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE) {
-            int[] y = {1, 3, 1, 3, 3};
-            for (int i = 0; i < y.length; i++)
-                barView.get(i).setNumColumns(preferences.getInt("CRy" + screenOrient + ("" + i), y[i]));
+        int[] y = {1, 3, 1, 3, 3};
+        for (int i = 0; i < y.length; i++)
+            barView.get(i).setNumColumns(preferences.getInt("CRy" + ("" + i), y[i]));
 
-            int[] z = {6, 4, 5, 5, 5};
-            for (int i = 0; i < z.length; i++)
-                barAdapter.get(i).setValue(preferences.getInt("CRz" + screenOrient + ("" + i), z[i]));
-        } else {
-            stateText.setTextSize(16);
-            out.setTextSize(24);
-
-            int[] y = {2, 4, 2, 5, 5};
-            for (int i = 0; i < y.length; i++)
-                barView.get(i).setNumColumns(preferences.getInt("CRy" + screenOrient + ("" + i), y[i]));
-
-            int[] z = {3, 3, 3, 3, 3};
-            for (int i = 0; i < z.length; i++)
-                barAdapter.get(i).setValue(preferences.getInt("CRz" + screenOrient + ("" + i), z[i]));
-        }
+        int[] z = {6, 4, 5, 5, 5};
+        for (int i = 0; i < z.length; i++)
+            barAdapter.get(i).setValue(preferences.getInt("CRz" + ("" + i), z[i]));
     }
 
     public int getScreenOrient(Activity activity) {
@@ -271,8 +256,8 @@ public class MainActivity extends BaseActivity {
 
     public void setBarCR(final int x, final int y, final int z) {
         SharedPreferences.Editor editor = preferences.edit();
-        editor.putInt("CRy" + screenOrient + ("" + x), y);
-        editor.putInt("CRz" + screenOrient + ("" + x), z);
+        editor.putInt("CRy" + ("" + x), y);
+        editor.putInt("CRz" + ("" + x), z);
         editor.apply();
         runOnUiThread(new Runnable() {
             @Override
@@ -314,7 +299,7 @@ public class MainActivity extends BaseActivity {
                         String text = ((TextView) view.findViewById(R.id.text_item)).getText().toString();
                         AlertDialog.Builder dialog = new AlertDialog.Builder(MainActivity.this);
                         dialog.setTitle(text);
-                        dialog.setMessage(helpUtil.getHelpText(text));
+                        dialog.setMessage(helpUtil.getFunctionHelp(text));
                         dialog.setPositiveButton("确定", null);
                         dialog.show();
                         return true;
@@ -370,9 +355,6 @@ public class MainActivity extends BaseActivity {
     }
 
     private void initNumeric() {
-        if (screenOrient == ActivityInfo.SCREEN_ORIENTATION_PORTRAIT)
-            numeric = new String[]{"7", "8", "9", "A", "4", "5", "6", "B", "1", "2", "3", "C", "·", "0", "=", "D",
-                    "⑵", "⑶", "⑷", "E", "⑸", "⑹", "⑺", "F", "⑻", "⑼", "⑽", "⑾", "⑿", "⒀", "⒁", "⒂", "⒃"};
         GridView numericBar = (GridView) findViewById(R.id.bar_numeric);
         barView.add(numericBar);
         numericBar.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -495,14 +477,14 @@ public class MainActivity extends BaseActivity {
                 for (int n = spans.length; n-- > 0; )
                     s.removeSpan(spans[n]);
 
+                for (Matcher m = Pattern.compile("[\\p{P}+^=÷×√°]").matcher(s); m.find(); )
+                    s.setSpan(new ForegroundColorSpan(0xff81d4fa), m.start(), m.end(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+                for (Matcher m = Pattern.compile("[∞xi]").matcher(s); m.find(); )
+                    s.setSpan(new ForegroundColorSpan(0xfff48fb1), m.start(), m.end(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
                 for (Matcher m = keywords.matcher(s); m.find(); )
                     s.setSpan(new ForegroundColorSpan(0xffa5d6a7), m.start(), m.end(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
                 for (Matcher m = Pattern.compile("\\d*").matcher(s); m.find(); )
                     s.setSpan(new ForegroundColorSpan(0xffeeeeee), m.start(), m.end(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
-                for (Matcher m = Pattern.compile("\\b[°∞xi]\\b").matcher(s); m.find(); )
-                    s.setSpan(new ForegroundColorSpan(0xfff48fb1), m.start(), m.end(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
-                for (Matcher m = Pattern.compile("[\\p{P}+^=÷×√]").matcher(s); m.find(); )
-                    s.setSpan(new ForegroundColorSpan(0xff81d4fa), m.start(), m.end(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
                 modified = false;
                 editText.setText(s);
                 modified = true;
@@ -527,10 +509,7 @@ public class MainActivity extends BaseActivity {
             @Override
             public boolean onMenuItemClick(MenuItem item) {
                 AlertDialog.Builder dialog = new AlertDialog.Builder(MainActivity.this);
-                dialog.setTitle("帮助");
-                dialog.setMessage("函数的使用帮助可以长按对应的函数按钮查看");
-                dialog.setPositiveButton("确定", null);
-                dialog.show();
+                dialog.setTitle("帮助").setMessage(R.string.app_help).setPositiveButton("确定", null).show();
                 return true;
             }
         });

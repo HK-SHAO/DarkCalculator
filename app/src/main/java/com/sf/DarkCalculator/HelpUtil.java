@@ -9,10 +9,10 @@ import java.util.Map;
 
 public class HelpUtil {
 
-    private static Map map;
+    private static Map<String, String> map;
 
     public HelpUtil() {
-        map = new HashMap();
+        map = new HashMap<>();
         map.put("sqrt", "sqrt函数返回输入参数的平方根，需要1个参数");
         map.put("cbrt", "cbrt函数返回输入参数的立方根，需要1个参数");
         map.put("root", "root函数返回输入参数的根，需要2个参数，第1个参数为所开方的数，第2个是开方的次数");
@@ -74,7 +74,7 @@ public class HelpUtil {
         map.put("setTS", "setTS函数用于设置全局字体大小的缩放比例，需要1个参数（注意，输入的参数千万不要太大或者太小，否则你可能需要清楚应用数据以恢复字体大小）");
     }
 
-    public String getHelpText(String key) {
+    public String getFunctionHelp(String key) {
         return (String) map.get(key);
     }
 }
