@@ -330,7 +330,7 @@ public class Expression {
 
         // Not found
         if (listPos < 0)
-            return new Result(1).append("没有函数 “" + s + "”");
+            return new Result(1).append("没有函数 “" + s.substring(0, s.length() - 2) + "”");
 
         funcID = Function.funcList[listPos].funcSerial;
         leftBr = l + Function.funcList[listPos].funcName.length();
@@ -506,14 +506,14 @@ public class Expression {
                 return limit(leftBr + 1, nextFS[leftBr] - 1, val[1], val[2]);
             case Function.EVAL + 2:
                 return value(leftBr + 1, nextFS[leftBr] - 1, val[1]);
+            case Function.FZERO + 1:
+                return solve(leftBr + 1, nextFS[leftBr] - 1, new Complex(Math.random(), Math.random()));
             case Function.FZERO + 2:
                 return solve(leftBr + 1, nextFS[leftBr] - 1, val[1]);
             case Function.INTEG + 3:
                 return integrate(leftBr + 1, nextFS[leftBr] - 1, val[1], val[2]);
             case Function.SUM + 3:
                 return sum(leftBr + 1, nextFS[leftBr] - 1, val[1], val[2]);
-            case Function.PERM + 1:
-                return new Result(Complex.gamma(new Complex(val[0].re + 1, val[0].im)));
             case Function.PERM + 2:
                 return new Result(perm(val[0], val[1]));
             case Function.COMB + 2:
@@ -557,13 +557,13 @@ public class Expression {
         boolean iscjPreSymbol = (cj == ')' || cj == '∞' || cj == 'π' || cj == '°' || cj == '%');
         boolean iscjNumber = (cj >= '0' && cj <= '9' || cj == '.');
         boolean iscjBase = ParseNumber.isBaseSymbol(cj);
-        boolean iscjFunc = ((cj >= 'a' && cj <= 'z') || cj == '_');
+        boolean iscjFunc = (cj >= 'a' && cj <= 'z');
         boolean isciNumber = (cj >= '0' && cj <= '9' || cj == '.');
         //boolean isciBase=ParseNumber.isBaseSymbol(ci);
 
-        boolean case1 = (ci >= 'a' && ci <= 'z' || ci == '_' || ci == '(') && (iscjNumber || iscjPreSymbol || iscjBase);
+        boolean case1 = (ci >= 'a' && ci <= 'z' || ci == '(') && (iscjNumber || iscjPreSymbol || iscjBase);
         boolean case2 = (isciNumber) && (iscjPreSymbol || iscjFunc);
-        boolean case3 = (ci == '∞' || ci == 'π' || ci == '°' || ci == '%' || ci == '√' || ci == 'Γ') && (iscjNumber || iscjPreSymbol || iscjBase || iscjFunc);
+        boolean case3 = (ci == '∞' || ci == 'π' || ci == '°' || ci == '%' || ci == '√') && (iscjNumber || iscjPreSymbol || iscjBase || iscjFunc);
 
         return case1 || case2 || case3;
     }

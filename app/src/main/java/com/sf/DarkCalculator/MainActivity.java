@@ -1,11 +1,9 @@
 package com.sf.DarkCalculator;
 
-import android.app.Activity;
 import android.content.ClipboardManager;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.content.pm.ActivityInfo;
 import android.os.Bundle;
 import android.support.design.widget.Snackbar;
 import android.support.design.widget.TabLayout;
@@ -19,11 +17,9 @@ import android.text.Editable;
 import android.text.Spannable;
 import android.text.TextWatcher;
 import android.text.style.ForegroundColorSpan;
-import android.view.Display;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.WindowManager;
 import android.widget.AdapterView;
 import android.widget.EditText;
 import android.widget.GridView;
@@ -122,18 +118,6 @@ public class MainActivity extends BaseActivity {
         int[] z = {6, 4, 5, 5, 5};
         for (int i = 0; i < z.length; i++)
             barAdapter.get(i).setValue(preferences.getInt("CRz" + ("" + i), z[i]));
-    }
-
-    public int getScreenOrient(Activity activity) {
-        int orient = activity.getRequestedOrientation();
-        if (orient != ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE && orient != ActivityInfo.SCREEN_ORIENTATION_PORTRAIT) {
-            WindowManager windowManager = activity.getWindowManager();
-            Display display = windowManager.getDefaultDisplay();
-            int screenWidth = display.getWidth();
-            int screenHeight = display.getHeight();
-            orient = screenWidth < screenHeight ? ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE : ActivityInfo.SCREEN_ORIENTATION_PORTRAIT;
-        }
-        return orient;
     }
 
     private void initKeyWords() {

@@ -377,7 +377,6 @@ public class Complex {
     public static Complex gamma(Complex c) { // Lanczos approximation + Taylor series
 
         if (c.re == Double.POSITIVE_INFINITY && c.im == 0) return Complex.Inf;
-        //if(c.re==Double.NEGATIVE_INFINITY)return new Complex();
 
         Complex result;
 
