@@ -742,9 +742,6 @@ public class Expression {
     Result solve(int l, int r, Complex x0) { // auto solver
         Result rp;
         for (double M = 1.0; M > 0.05; M *= 0.7) {
-
-            //System.out.println("Relaxation M = "+new Double(M).toString()
-            //		+" , MaxLoop = "+new Integer((int)Math.round(1500/Math.sqrt(M))).toString());
             rp = solve(l, r, x0, new Complex(M), (int) Math.round(1500 / Math.sqrt(M)));
             if (rp.isFatalError()) return rp;
             if (rp.val.isValid() && !rp.val.isNaN()) {
@@ -993,7 +990,7 @@ public class Expression {
         n = n_;
         m = m_;
 
-        for (; ; ) { // adapted from iteration
+        while (true) { // adapted from iteration
             if (n.re > 1 && m.re > 1) {
                 ans = Complex.mul(new Complex(n.re / m.re), ans);
                 n.re -= 1;

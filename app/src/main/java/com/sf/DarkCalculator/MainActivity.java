@@ -59,10 +59,10 @@ public class MainActivity extends BaseActivity {
 
     private HelpUtil helpUtil;
     private Pattern keywords;
-    final private String[] operator = {"DEL", "÷", "×", "-", "+", "%", ",", "i"};
-    final private String[] operatorVice = {"CLR", "√", "^", "!", "()", "°", "∞", "x"};
+    final private String[] OPERATOR = {"DEL", "÷", "×", "-", "+", "%", ",", "i"};
+    final private String[] OPERATOR_VICE = {"CLR", "√", "^", "!", "()", "°", "∞", "x"};
 
-    final private String[][] function = {
+    final private String[][] FUNCTION = {
             {"sqrt", "cbrt", "root", "rand", "randInt", "lg", "ln", "log",
                     "abs", "min", "max", "fact", "sin", "cos", "tan", "asin", "acos",
                     "atan", "sinh", "cosh", "tanh", "asinh", "acosh", "atanh", "recipr",
@@ -72,7 +72,7 @@ public class MainActivity extends BaseActivity {
                     "isOdd", "toDEG", "toRAD", "reStart", "setPrec", "setBase", "setCR", "setTS"},
             {"ans", "reg", "π", "e", "F", "h", "ћ", "γ", "φ", "c", "N", "R", "k", "G", "Φ", "me", "mn", "mp"}};
 
-    final private String[][] functionVice = {
+    final private String[][] FUNCTION_VICE = {
             {"平方根", "立方根", "开方", "随机复数", "随机整数", "常用对数", "自然对数", "对数",
                     "绝对值", "最小", "最大", "阶乘", "正弦", "余弦", "正切", "反正弦", "反余弦",
                     "反正切", "双曲正弦", "双曲余弦", "双曲正切", "反双曲正弦", "反双曲余弦",
@@ -84,10 +84,10 @@ public class MainActivity extends BaseActivity {
             "上次运算", "寄存器", "圆周率", "自然底数", "法拉第", "普朗克", "约化普朗克", "欧拉", "黄金分割",
             "光速", "阿伏伽德罗", "理想气体", "玻尔兹曼", "万有引力", "磁通量子", "电子质量", "质子质量", "中子质量"}};
 
-    final private String[] functionList = {"科学计算", "大数计算", "时间计算", "进制转换",
+    final private String[] FUNCTION_LIST = {"科学计算", "大数计算", "时间计算", "进制转换",
             "方程式配平", "分子量计算", "亲戚关系计算", "大写数字", "汇率转换", "单位转换"};
 
-    final private String[] numeric = {"7", "8", "9", "4", "5", "6", "1", "2", "3", "·", "0", "=", "A", "B", "C", "D", "E", "F",
+    final private String[] NUMERIC = {"7", "8", "9", "4", "5", "6", "1", "2", "3", "·", "0", "=", "A", "B", "C", "D", "E", "F",
             "⑵", "⑶", "⑷", "⑸", "⑹", "⑺", "⑻", "⑼", "⑽", "⑾", "⑿", "⒀", "⒁", "⒂", "⒃"};
 
     @Override
@@ -123,7 +123,7 @@ public class MainActivity extends BaseActivity {
     private void initKeyWords() {
         StringBuffer sb = new StringBuffer();
         sb.append("(\\d+|\\b)(");
-        for (String[] array : function)
+        for (String[] array : FUNCTION)
             for (String str : array) {
                 sb.append(str + "|");
             }
@@ -186,7 +186,7 @@ public class MainActivity extends BaseActivity {
                 drawer.closeDrawer(GravityCompat.START);
             }
         });
-        GridViewAdapter sideBarAdapter = new GridViewAdapter(this, sideBar, Arrays.asList(functionList), R.layout.button_sidebar);
+        GridViewAdapter sideBarAdapter = new GridViewAdapter(this, sideBar, Arrays.asList(FUNCTION_LIST), R.layout.button_sidebar);
         barAdapter.add(sideBarAdapter);
         sideBar.setAdapter(sideBarAdapter);
     }
@@ -290,8 +290,8 @@ public class MainActivity extends BaseActivity {
                     }
                 });
             int id = i == 0 ? R.layout.button_function : R.layout.button_constant;
-            GridViewAdapter operatorProAdapter = new GridViewAdapter(this, operatorProBar, Arrays.asList(function[i++]), id);
-            operatorProAdapter.setViceText(Arrays.asList(functionVice[i - 1]));
+            GridViewAdapter operatorProAdapter = new GridViewAdapter(this, operatorProBar, Arrays.asList(FUNCTION[i++]), id);
+            operatorProAdapter.setViceText(Arrays.asList(FUNCTION_VICE[i - 1]));
 
             barAdapter.add(operatorProAdapter);
             operatorProBar.setAdapter(operatorProAdapter);
@@ -332,9 +332,9 @@ public class MainActivity extends BaseActivity {
                 return true;
             }
         });
-        GridViewAdapter operatorAdapter = new GridViewAdapter(this, operatorBar, Arrays.asList(operator), R.layout.button_operator);
+        GridViewAdapter operatorAdapter = new GridViewAdapter(this, operatorBar, Arrays.asList(OPERATOR), R.layout.button_operator);
         barAdapter.add(operatorAdapter);
-        operatorAdapter.setViceText(Arrays.asList(operatorVice));
+        operatorAdapter.setViceText(Arrays.asList(OPERATOR_VICE));
         operatorBar.setAdapter(operatorAdapter);
     }
 
@@ -386,7 +386,7 @@ public class MainActivity extends BaseActivity {
                 editText.getText().insert(index, str);
             }
         });
-        GridViewAdapter numericAdapter = new GridViewAdapter(this, numericBar, Arrays.asList(numeric), R.layout.button_numeric);
+        GridViewAdapter numericAdapter = new GridViewAdapter(this, numericBar, Arrays.asList(NUMERIC), R.layout.button_numeric);
         barAdapter.add(numericAdapter);
         numericBar.setAdapter(numericAdapter);
     }
