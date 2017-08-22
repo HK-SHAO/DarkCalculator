@@ -988,7 +988,6 @@ public class Expression {
     }
 
     private Complex combIter(Complex n_, Complex m_) { // Gamma(n+1)/Gamma(m+1)/Gamma(n-m+1)
-
         Complex n, m;
         Complex ans = new Complex(1);
         n = n_;
@@ -996,17 +995,9 @@ public class Expression {
 
         for (; ; ) { // adapted from iteration
             if (n.re > 1 && m.re > 1) {
-                if (n.re - m.re >= 1) {
-                    ans = Complex.mul(new Complex(n.re), ans);
-                    n.re -= 1;
-                } else if (m.re - n.re >= 1) {
-                    ans = Complex.div(ans, new Complex(m.re));
-                    m.re -= 1;
-                } else {
-                    ans = Complex.mul(new Complex(n.re / m.re), ans);
-                    n.re -= 1;
-                    m.re -= 1;
-                }
+                ans = Complex.mul(new Complex(n.re / m.re), ans);
+                n.re -= 1;
+                m.re -= 1;
             } else {
                 Complex af = Complex.div(perm(n, m), Complex.gamma(new Complex(m.re + 1, m.im)));
                 ans = Complex.mul(af, ans);

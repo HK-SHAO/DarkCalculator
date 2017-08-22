@@ -406,6 +406,7 @@ public class MainActivity extends BaseActivity {
             method.setAccessible(true);
             method.invoke(editText, false);
         } catch (Exception e) {
+            e.printStackTrace();
         }
         AutofitHelper.create(editText).setMinTextSize(28);
         editText.requestFocus();

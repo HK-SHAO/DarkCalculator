@@ -368,7 +368,6 @@ public class Complex {
             -176.61502916214059, 12.507343278686905, -0.13857109526572012,
             9.9843695780195716E-6, 1.5056327351493116E-7
     };
-
     private static double[] gammaT = { // constants for Taylor approximation
             -0.57721566490153286, 0.9890559953279725, 0.9074790760808862,
             0.9817280868344002, 0.9819950689031453, 0.9931491146212761
@@ -377,6 +376,7 @@ public class Complex {
     public static Complex gamma(Complex c) { // Lanczos approximation + Taylor series
 
         if (c.re == Double.POSITIVE_INFINITY && c.im == 0) return Complex.Inf;
+        //if(c.re==Double.NEGATIVE_INFINITY)return new Complex();
 
         Complex result;
 
