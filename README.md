@@ -13,7 +13,7 @@ Calci-kernel开源地址：https://github.com/Iraka-C/Calci-kernel
 ## 下载APK
 险恶计算器：https://www.coolapk.com/apk/com.sf.DarkCalculator
 Calci计算器：https://www.coolapk.com/apk/com.iraka.calci
-（喜欢的话评个五星哦）
+（喜欢的话就评个五星哦）
 
 ## 截图
 ![](/GIF/GIF1.gif)
