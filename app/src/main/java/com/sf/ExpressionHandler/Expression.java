@@ -1020,36 +1020,46 @@ public class Expression {
     private Result limitH(int l, int r, Complex x0, Complex h) {
 
         Complex f0;
+        boolean finiteLimit = x0.isFinite();
 
-        if (x0.isFinite()) {
+        Complex x1, x2, x3, x4;
 
-            Complex x1 = Complex.add(x0, h);
-            Complex x2 = Complex.add(x0, Complex.mul(h, hRatio));
-            Complex x3 = Complex.sub(x0, h);
-            Complex x4 = Complex.sub(x0, Complex.mul(h, hRatio));
+        if (finiteLimit) {
+            x1 = Complex.add(x0, h);
+            x2 = Complex.add(x0, Complex.mul(h, hRatio));
+            x3 = Complex.sub(x0, h);
+            x4 = Complex.sub(x0, Complex.mul(h, hRatio));
+        } else {
+            double norm2 = h.norm2();
+            x1 = new Complex(h.re / norm2, h.im / norm2);
+            x2 = new Complex(x1.re * 2, x1.im * 2);
+            x3 = new Complex(x1.re * 3, x1.im * 3);
+            x4 = new Complex(x1.re * 4, x1.im * 4);
+        }
 
-            Result r1 = value(l, r, x1);
-            Result r2 = value(l, r, x2);
-            Result r3 = value(l, r, x3);
-            Result r4 = value(l, r, x4);
+        Result r1 = value(l, r, x1);
+        if (r1.isFatalError()) return r1;
+        Result r2 = value(l, r, x2);
+        if (r2.isFatalError()) return r2;
+        Result r3 = value(l, r, x3);
+        if (r3.isFatalError()) return r3;
+        Result r4 = value(l, r, x4);
+        if (r4.isFatalError()) return r4;
 
-            if (r1.isFatalError()) return r1;
-            if (r2.isFatalError()) return r2;
-            if (r3.isFatalError()) return r3;
-            if (r4.isFatalError()) return r4;
+        Complex f1 = r1.val;
+        Complex f2 = r2.val;
+        Complex f3 = r3.val;
+        Complex f4 = r4.val;
 
-            Complex f1 = r1.val;
-            Complex f2 = r2.val;
-            Complex f3 = r3.val;
-            Complex f4 = r4.val;
-
+        if (finiteLimit) {
             Complex f13 = Complex.mul(Complex.add(f1, f3), par2p);
             Complex f24 = Complex.mul(Complex.add(f2, f4), par2n);
             f0 = Complex.add(f13, f24);
         } else {
-            double norm2 = h.norm2();
-            Complex N = new Complex(h.re / norm2, h.im / norm2);
-            return value(l, r, N);
+            f0 = new Complex(
+                    (-f1.re + 24 * f2.re - 81 * f3.re + 64 * f4.re) / 6,
+                    (-f1.im + 24 * f2.im - 81 * f3.im + 64 * f4.im) / 6
+            );
         }
 
         return new Result(f0);
@@ -1057,6 +1067,8 @@ public class Expression {
 
     // general limit
     public Result limit(int l, int r, Complex x0) {
+
+        //new Result(-1).append("Evaluator","Function limit() still requires improvement. Results are only for development.",l,r);
 
         // Responsibility recharge
         if (Double.isInfinite(x0.re)) { // to real infinity
@@ -1126,6 +1138,8 @@ public class Expression {
             limitVar += Complex.sub(limitRes[i], limitSum).norm2();
         }
 
+        //Log.i("Limit","Dvar="+limitVar);
+
         Result res = new Result(limitSum);
         if (limitVar > 1E-5) {
             res.append("函数可能没有收敛到预期精度");
@@ -1174,11 +1188,14 @@ public class Expression {
             histRes.add(res);
         }
 
+        if (minPos < 1) {
+            return new Result(-1).append("函数在给定点上可能没有收敛");
+        }
         Complex minRes = histRes.get(minPos - 1);
         //Log.i("Limit","err="+minDe);
 
         if (minDe > 1E-5) { // didn't found ?
-            return new Result(minRes).append("函数在给定点上可能没有收敛");
+            return new Result(-1).append("函数在给定点上可能没有收敛");
         } else { // found
             return new Result(minRes);
         }

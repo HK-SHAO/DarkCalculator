@@ -76,7 +76,7 @@ public class MainActivity extends BaseActivity {
             {"平方根", "立方根", "开方", "随机复数", "随机整数", "常用对数", "自然对数", "对数",
                     "绝对值", "最小", "最大", "阶乘", "正弦", "余弦", "正切", "反正弦", "反余弦",
                     "反正切", "双曲正弦", "双曲余弦", "双曲正切", "反双曲正弦", "反双曲余弦",
-                    "反双曲正切", "倒数", "累加求和", "实部", "虚部", "辐角", "范数", "寄存",
+                    "反双曲正切", "倒数", "累加求和", "实部", "虚部", "辐角", "模长", "寄存",
                     "共轭复数", "导函数", "极限", "求值", "函数零点", "定积分", "e底指数",
                     "最大公约", "最小公倍", "排列", "组合", "四舍五入", "向下取整", "向上取整",
                     "取正负号", "伽玛函数", "取余", "分数化简", "质数", "判断质数", "判断奇数",
@@ -494,7 +494,10 @@ public class MainActivity extends BaseActivity {
             @Override
             public boolean onMenuItemClick(MenuItem item) {
                 AlertDialog.Builder dialog = new AlertDialog.Builder(MainActivity.this);
-                dialog.setTitle("帮助").setMessage(R.string.app_help).setPositiveButton("确定", null).show();
+                dialog.setTitle("帮助")
+                        .setMessage(R.string.app_help)
+                        .setPositiveButton("确定", null)
+                        .show();
                 return true;
             }
         });

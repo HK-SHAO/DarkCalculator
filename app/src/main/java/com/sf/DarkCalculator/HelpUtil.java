@@ -9,7 +9,7 @@ import java.util.Map;
 
 public class HelpUtil {
 
-    private static Map<String, String> map;
+    private static Map<String, String> map = null;
 
     public HelpUtil() {
         map = new HashMap<>();
