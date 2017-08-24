@@ -50,9 +50,9 @@ public class MainActivity extends BaseActivity {
     public static MainActivity activity;
     private Context context;
     private Toolbar toolbar;
-    private EditText editText;
+    private EditText inText;
     private TextView stateText;
-    private TextView out;
+    private TextView outText;
     private ViewPager drawerPager;
     private DrawerLayout drawer;
     private ArrayList<View> drawerPageList;
@@ -137,15 +137,16 @@ public class MainActivity extends BaseActivity {
         stateText.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                ExpressionHandler.stop();
                 stateText.setText(null);
             }
         });
-        out = (TextView) findViewById(R.id.text_out);
-        out.setOnClickListener(new View.OnClickListener() {
+        outText = (TextView) findViewById(R.id.text_out);
+        outText.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (out.getText().toString().indexOf("重启") != -1) {
-                    editText.setText("reStart()");
+                if (outText.getText().toString().indexOf("重启") != -1) {
+                    inText.setText("reStart()");
                     return;
                 }
                 ClipboardManager cmb = (ClipboardManager) context.getSystemService(Context.CLIPBOARD_SERVICE);
@@ -153,7 +154,7 @@ public class MainActivity extends BaseActivity {
                 Snackbar.make(v, "已复制运算结果", Snackbar.LENGTH_SHORT).show();
             }
         });
-        out.setOnLongClickListener(new View.OnLongClickListener() {
+        outText.setOnLongClickListener(new View.OnLongClickListener() {
             @Override
             public boolean onLongClick(View v) {
                 ResultsActivity.actionStart(v.getContext(), rootValue);
@@ -267,11 +268,11 @@ public class MainActivity extends BaseActivity {
                         Snackbar.make(view, "此函数还未完善", Snackbar.LENGTH_SHORT).show();
                         return;
                     }
-                    Editable editable = editText.getText();
-                    int index = editText.getSelectionStart();
+                    Editable editable = inText.getText();
+                    int index = inText.getSelectionStart();
                     editable.insert(index, str + s);
                     if (s.length() != 0)
-                        editText.setSelection(index + str.length() + s.length() - 1);
+                        inText.setSelection(index + str.length() + s.length() - 1);
                 }
             });
             if (i == 0)
@@ -305,8 +306,8 @@ public class MainActivity extends BaseActivity {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 String str = ((TextView) view.findViewById(R.id.text_item)).getText().toString();
-                Editable editable = editText.getText();
-                int index = editText.getSelectionStart();
+                Editable editable = inText.getText();
+                int index = inText.getSelectionStart();
                 if (str.equals("DEL")) {
                     if (index == 0) {
                         return;
@@ -322,13 +323,13 @@ public class MainActivity extends BaseActivity {
             public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
                 String str = ((TextView) view.findViewById(R.id.text_vice_item)).getText().toString();
                 if (str.equals("CLR")) {
-                    editText.setText(null);
+                    inText.setText(null);
                     return true;
                 }
-                int index = editText.getSelectionStart();
-                editText.getText().insert(index, str);
+                int index = inText.getSelectionStart();
+                inText.getText().insert(index, str);
                 if (str.equals("()"))
-                    editText.setSelection(index + str.length() - 1);
+                    inText.setSelection(index + str.length() - 1);
                 return true;
             }
         });
@@ -345,7 +346,7 @@ public class MainActivity extends BaseActivity {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 String str = ((TextView) view.findViewById(R.id.text_item)).getText().toString();
-                int index = editText.getSelectionStart();
+                int index = inText.getSelectionStart();
                 if (str.equals("=")) {
                     if (calcThread != null) {
                         Snackbar.make(view, "请等待运算完成", Snackbar.LENGTH_SHORT).show();
@@ -356,22 +357,22 @@ public class MainActivity extends BaseActivity {
                         @Override
                         public void run() {
                             final long t = System.currentTimeMillis();
-                            final String[] value = ExpressionHandler.calculation(editText.getText().toString());
+                            final String[] value = ExpressionHandler.calculation(inText.getText().toString());
                             runOnUiThread(new Runnable() {
                                 @Override
                                 public void run() {
                                     stateText.setText("运算结束，耗时 " + (System.currentTimeMillis() - t) + " 毫秒");
                                     if (value[1].equals("true")) {
-                                        out.setTextColor(0xffff4081);
-                                        out.setText(value[0]);
+                                        outText.setTextColor(0xffff4081);
+                                        outText.setText(value[0]);
                                     } else {
-                                        out.setTextColor(0xffbdbdbd);
+                                        outText.setTextColor(0xffbdbdbd);
                                         Constants.constants.set(0, new String[]{"ans", value[0]});
                                         if (value[0].getBytes().length > 1000) {
-                                            out.setText("数值太大，请长按此处显示结果");
+                                            outText.setText("数值太大，请长按此处显示结果");
                                             ResultsActivity.actionStart(context, value[0]);
                                         } else
-                                            out.setText(value[0]);
+                                            outText.setText(value[0]);
                                     }
                                     rootValue = value[0];
                                     calcThread = null;
@@ -383,7 +384,7 @@ public class MainActivity extends BaseActivity {
                     return;
                 }
                 str = str.equals("·") ? "." : str;
-                editText.getText().insert(index, str);
+                inText.getText().insert(index, str);
             }
         });
         GridViewAdapter numericAdapter = new GridViewAdapter(this, numericBar, Arrays.asList(NUMERIC), R.layout.button_numeric);
@@ -397,22 +398,22 @@ public class MainActivity extends BaseActivity {
     private String rootValue;
 
     private void initEditText() {
-        editText = (EditText) findViewById(R.id.editText);
+        inText = (EditText) findViewById(R.id.editText);
 
         Class<EditText> cls = EditText.class;
         Method method;
         try {
             method = cls.getMethod("setShowSoftInputOnFocus", boolean.class);
             method.setAccessible(true);
-            method.invoke(editText, false);
+            method.invoke(inText, false);
         } catch (Exception e) {
             e.printStackTrace();
         }
-        AutofitHelper.create(editText).setMinTextSize(28);
-        editText.requestFocus();
-        editText.requestFocusFromTouch();
+        AutofitHelper.create(inText).setMinTextSize(28);
+        inText.requestFocus();
+        inText.requestFocusFromTouch();
 
-        editText.addTextChangedListener(new TextWatcher() {
+        inText.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {
 
@@ -421,9 +422,10 @@ public class MainActivity extends BaseActivity {
             @Override
             public void onTextChanged(final CharSequence s, int start, int before, int count) {
                 if (s.length() == 0) {
+                    ExpressionHandler.stop();
                     stateText.setText(null);
-                    out.setTextColor(0xffbdbdbd);
-                    out.setText("···");
+                    outText.setTextColor(0xffbdbdbd);
+                    outText.setText("···");
                     return;
                 }
                 if (calcThread == null) {
@@ -436,12 +438,12 @@ public class MainActivity extends BaseActivity {
                             runOnUiThread(new Runnable() {
                                 @Override
                                 public void run() {
-                                    out.setTextColor(0xffbdbdbd);
+                                    outText.setTextColor(0xffbdbdbd);
                                     stateText.setText("运算结束，耗时 " + (System.currentTimeMillis() - t) + " 毫秒");
                                     if (value[0].getBytes().length > 1000) {
-                                        out.setText("数值太大，请长按此处显示结果");
+                                        outText.setText("数值太大，请长按此处显示结果");
                                     } else
-                                        out.setText(value[0]);
+                                        outText.setText(value[0]);
                                     rootValue = value[0];
                                     calcThread = null;
                                 }
@@ -457,7 +459,7 @@ public class MainActivity extends BaseActivity {
                 if (!modified) {
                     return;
                 }
-                selection = editText.getSelectionEnd();
+                selection = inText.getSelectionEnd();
                 ForegroundColorSpan spans[] = s.getSpans(0, s.length(), ForegroundColorSpan.class);
                 for (int n = spans.length; n-- > 0; )
                     s.removeSpan(spans[n]);
@@ -471,9 +473,9 @@ public class MainActivity extends BaseActivity {
                 for (Matcher m = Pattern.compile("\\d*").matcher(s); m.find(); )
                     s.setSpan(new ForegroundColorSpan(0xffeeeeee), m.start(), m.end(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
                 modified = false;
-                editText.setText(s);
+                inText.setText(s);
                 modified = true;
-                editText.setSelection(selection);
+                inText.setSelection(selection);
             }
         });
     }

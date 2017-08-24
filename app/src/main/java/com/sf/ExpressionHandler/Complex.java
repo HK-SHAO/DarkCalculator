@@ -29,7 +29,12 @@ public class Complex {
 
     public Complex(String answer_) {
         answer = answer_;
-        re = Double.parseDouble(answer_);
+        im = 0;
+        try {
+            re = Double.parseDouble(answer_);
+        } catch (Exception e) {
+            re = Double.NaN;
+        }
     }
 
     public Complex(boolean b) {

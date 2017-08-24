@@ -6,12 +6,12 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Expression {
-    public String text;
-    public int[] br; // Bracket Depth
-    public int[] lastLB; // last left bracket of the same level
-    public int[] nextFS; // next functional symbol of the same level
-    public int[] commaCnt; // for each '(', how many comma belongs to it?
-    public int[] funcSer; // the function interpreted
+    private String text;
+    private int[] br; // Bracket Depth
+    private int[] lastLB; // last left bracket of the same level
+    private int[] nextFS; // next functional symbol of the same level
+    private int[] commaCnt; // for each '(', how many comma belongs to it?
+    private int[] funcSer; // the function interpreted
     private int brDiff; // the difference of ( and )
 
     // Cache number parsing result, reduce time consumption
@@ -22,10 +22,10 @@ public class Expression {
     private int[] isAddSubParseResult; // is this an add/sub symbol ?
     private boolean[] isOmitMult; // is '*' omitted here ?
 
-    public volatile boolean isExited;
+    private volatile boolean isWorking;
 
     private static final String mathOperator = "+-*/^√×÷!";
-    private static Complex memValue = new Complex(Double.NaN, Double.NaN); // for memory function
+    private static Complex memValue = new Complex(); // for memory function
 
     public Expression(String s) {
         text = s;
@@ -139,6 +139,8 @@ public class Expression {
     // 0+NaN*I is never possible during a calculation
     // and is so used as "No Variable X provided" sign
     public Result value(int l, int r, Complex vX) {
+        if (!isWorking) return new Result(1).append("已强制停止运算");
+
         if (l > r) {
             return new Result(1).append("表达式语法错误");
         }
@@ -539,11 +541,6 @@ public class Expression {
                     return new Result(1).setVal(new Complex(1)).append("函数的参数无效");
                 Result.setBase(base);
                 return new Result(0).append("输出进制被设置为 " + base + " 进制，" + "精度为 " + Result.precision + " 位小数");
-            case Function.BASE + 2:
-                base = (int) Math.round(val[1].re);
-                if (!(base >= 2 && base <= 10 || base == 12 || base == 16))
-                    return new Result(1).setVal(new Complex(1)).append("函数的参数无效");
-                return new Result(new Complex(ParseNumber.toBaseString(val[0].re, base, Result.precision)));
         }
         return new Result(1).append("函数 “" + Function.funcList[listPos].funcName + "” 参数错误");
     }
@@ -570,15 +567,15 @@ public class Expression {
 
     public Result value() { // Entrance !
         // 0+NaNi id a sign for "No Variable X provided" initially
+        isWorking = true;
 
-        isExited = false;
+        isIntegOverTolerance = false;
+        isDiffOverTolerance = false;
 
         if (brDiff != 0) {
-            isExited = true;
             return new Result(1).append("括号不匹配");
         }
         Result res = value(0, text.length() - 1, new Complex(0, Double.NaN));
-        isExited = true;
         return res;
     }
 
@@ -660,7 +657,7 @@ public class Expression {
         Complex v1 = res1.val;
         Complex r1 = Complex.div(v1, diff(l, r, x1).val);
         if (r1.isNaN()) {
-            return new Result(1).append("无效的初始值"); // Error occurred
+            return new Result(1).append("无效的初始值");
         }
         // 1 step Newton Method Iteration
         Complex x2 = Complex.sub(x1, r1);
@@ -671,7 +668,7 @@ public class Expression {
 
         Complex r2 = Complex.div(v2, diff(l, r, x2, r1).val); // use dir diff to speed up
         if (r2.isNaN()) {
-            return new Result(1).append("无效的初始值"); // Error occurred
+            return new Result(1).append("无效的初始值");
         }
 
         Complex x3;
@@ -683,20 +680,16 @@ public class Expression {
 
         for (int i = 0; i <= iter; i++) { // normally no more than 20 iter., but for eq. such as x^.2, more is needed.
 
+            if (!isWorking) return new Result(1).append("已强制停止运算");
+
             Complex d1 = Complex.mul(Complex.sub(x2, x1), r2);
             Complex d2 = Complex.sub(r2, r1);
 
 
             x3 = Complex.mul(Complex.sub(x2, Complex.div(d1, d2)), M); // Relaxation Param.
-            //Log.i("expression","Solve x3="+x3);
 
             Complex deltaX = Complex.sub(x2, x3);
             double deltaE = deltaX.norm2();
-            /*if(deltaX.norm2()<1E-20){ // 1E-10 precision
-                if(v2.norm2()<1E-20){
-					return new Result(x3);
-				}
-			}*/
 
             histRes.add(x3);
             if (i > 0) {
@@ -742,6 +735,8 @@ public class Expression {
     Result solve(int l, int r, Complex x0) { // auto solver
         Result rp;
         for (double M = 1.0; M > 0.05; M *= 0.7) {
+            if (!isWorking) return new Result(1).append("已强制停止运算");
+
             rp = solve(l, r, x0, new Complex(M), (int) Math.round(1500 / Math.sqrt(M)));
             if (rp.isFatalError()) return rp;
             if (rp.val.isValid() && !rp.val.isNaN()) {
@@ -754,9 +749,8 @@ public class Expression {
                 rp.append("尝试 Under-Relaxation 方法");
             }
         }
-        rp = new Result(1);
-        rp.append("寻找函数零点 " + text.substring(l, r + 1) + " 失败");
-        return rp;
+
+        return new Result(1).append("寻找函数零点 " + text.substring(l, r + 1) + " 失败");
     }
 
     // 15 nodes Gauss Quadrature
@@ -813,8 +807,11 @@ public class Expression {
 
     // integrate from x0 to x2, auto step-length
     private boolean isIntegOverTolerance = false; // only checked for once, reduce data traffic
+    private static final double infIntegrateStepRatio = Math.E * Math.E;
 
     Result adaptiveIntegrate(int l, int r, Complex x0, Complex x2, Complex lastSum, double TOL, int depth) {
+
+        if (!isWorking) return new Result(1).append("已强制停止运算");
 
         Complex x1;
 
@@ -825,9 +822,10 @@ public class Expression {
         if (Double.isInfinite(x2.re)) {
             double aRe = Math.abs(x0.re);
             double newRe;
-            if (aRe <= 5000) // Avoid precision lost due to large number
-                newRe = (aRe < 1 ? Math.exp(aRe) : Math.E * aRe);
-            else
+            if (aRe <= 1E5) { // Avoid precision loss due to large number
+                double logNextPoint = aRe * 2;
+                newRe = (logNextPoint < 1 ? Math.exp(logNextPoint) : infIntegrateStepRatio * aRe);
+            } else
                 return new Result(-1).setVal(new Complex(0));
 
             //System.out.println("New Point: "+x0.toString()+" ~ "+x2.toString());
@@ -850,13 +848,13 @@ public class Expression {
         if (sCB.isFinite()) sABnew = Complex.add(sABnew, sCB);
         abbr = Complex.sub(sAB, sABnew);
 
-        if (abbr.isValid() && abbr.norm2() < 200 * TOL) {
+        if (abbr.isValid() && abbr.norm2() < 200 * TOL) { // Under precision limit
             return new Result(sABnew);
         }
 
-        if (depth >= 18) {
+        if (depth >= 20) { // Max iteration
             Result r1 = new Result(sABnew);
-            if (!isIntegOverTolerance && abbr.norm2() > 2E6 * TOL) {
+            if (!isIntegOverTolerance && abbr.norm().re > 1E3 * TOL) {
                 isIntegOverTolerance = true;
                 r1.append("一定情况下函数失效");
             }
@@ -867,12 +865,19 @@ public class Expression {
         sAC = adaptiveIntegrate(l, r, x0, x1, sAC, TOL / 4, depth + 1).val;
         sCB = adaptiveIntegrate(l, r, x1, x2, sCB, TOL / 4, depth + 1).val;
         sABnew = Complex.add(sAC, sCB);
+
         return new Result(sABnew);
     }
 
     // general quadrature
     Result integrate(int l, int r, Complex x0, Complex x2) {
-        Result check = value(l, r, x0);
+        if (x0.isNaN()) {
+            return new Result(1).append("无效的下界");
+        }
+        if (x2.isNaN()) {
+            return new Result(1).append("无效的上界");
+        }
+        Result check = value(l, r, x0); // Check for syntax error. Better solution ?
         if (check.isFatalError()) return check;
 
         if (Double.isInfinite(x0.re)) {
@@ -917,6 +922,8 @@ public class Expression {
         }
         for (v.re = ds; v.re <= de; v.re += 1, cnt++) {
 
+            if (!isWorking) return new Result(1).append("已强制停止运算");
+
             v.im = (v.re - ds) * ratio + start.im;
             Result res = value(l, r, v);
             if (res.isFatalError()) {
@@ -951,7 +958,7 @@ public class Expression {
         n = n_;
         m = m_;
 
-        for (; ; ) { // adapted from iteration
+        while (true) { // adapted from iteration
             if (n.re > 1 && m.re > 1) {
                 if (n.re - m.re >= 1) {
                     ans = Complex.mul(new Complex(n.re), ans);
@@ -974,6 +981,7 @@ public class Expression {
             if (!ans.isFinite()) { // invalid value occurred, no need to continue
                 break;
             }
+            if (!isWorking) return new Complex(Double.NaN);
         }
 
         return ans;
@@ -1003,6 +1011,7 @@ public class Expression {
             if (!ans.isFinite()) { // invalid value occurred, no need to continue
                 break;
             }
+            if (!isWorking) return new Complex(Double.NaN);
         }
 
         return ans;
@@ -1068,8 +1077,6 @@ public class Expression {
     // general limit
     public Result limit(int l, int r, Complex x0) {
 
-        //new Result(-1).append("Evaluator","Function limit() still requires improvement. Results are only for development.",l,r);
-
         // Responsibility recharge
         if (Double.isInfinite(x0.re)) { // to real infinity
             return limit(l, r, x0, new Complex(x0.re > 0 ? 1 : -1));
@@ -1097,7 +1104,7 @@ public class Expression {
             for (h = 1E-1; h >= 1E-10; h *= 0.9, cnt++) {
                 Complex delta = new Complex(Math.cos(i * sectAngle) * h, Math.sin(i * sectAngle) * h);
                 Result resR = limitH(l, r, x0, delta);
-                if (resR.isFatalError()) return resR.append("未找到极限");
+                if (resR.isFatalError()) return new Result(1).append("未找到极限");
                 Complex res = resR.val;
 
                 if (cnt > 0) {
@@ -1165,7 +1172,7 @@ public class Expression {
         for (h = 1E-1; h >= 1E-10; h *= 0.9, cnt++) {
             Complex delta = new Complex(dir.re / norm * h, dir.im / norm * h);
             Result resR = limitH(l, r, x0, delta);
-            if (resR.isFatalError()) return resR.append("未找到极限");
+            if (resR.isFatalError()) return new Result(1).append("未找到极限");
             Complex res = resR.val;
 
             if (cnt > 0) {
@@ -1189,15 +1196,19 @@ public class Expression {
         }
 
         if (minPos < 1) {
-            return new Result(-1).append("函数在给定点上可能没有收敛");
+            return new Result(1).append("函数在给定点上可能没有收敛");
         }
         Complex minRes = histRes.get(minPos - 1);
         //Log.i("Limit","err="+minDe);
 
         if (minDe > 1E-5) { // didn't found ?
-            return new Result(-1).append("函数在给定点上可能没有收敛");
+            return new Result(1).append("函数在给定点上可能没有收敛");
         } else { // found
             return new Result(minRes);
         }
+    }
+
+    public void stopEvaluation() {
+        isWorking = false;
     }
 }

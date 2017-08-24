@@ -9,16 +9,28 @@ import com.sf.ExpressionHandler.Result;
 
 public class ExpressionHandler {
 
+    private static Expression expression = null;
+
     public static String[] calculation(String response) {
         String[] value;
         try {
-            Result r = new Expression(response).value();
-            boolean isError = r.isFatalError();
-            String val = r.val.toString();
+            expression = new Expression(response);
+            Result result = expression.value();
+            boolean isError = result.isFatalError();
+            String val = result.val.toString();
             value = new String[]{val, "" + isError};
         } catch (Exception e) {
+            e.printStackTrace();
             value = new String[]{"···", "true"};
         }
+        expression = null;
         return value;
+    }
+
+    public static void stop() {
+        if (expression != null) {
+            expression.stopEvaluation();
+            expression = null;
+        }
     }
 }
