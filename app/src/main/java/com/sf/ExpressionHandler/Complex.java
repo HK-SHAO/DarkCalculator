@@ -1,14 +1,5 @@
 package com.sf.ExpressionHandler;
 
-/*
- * Java Complex & Complex Function Class
- * Written by Iraka on 20170312
- *
- */
-
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
 public class Complex {
     public static Complex E = new Complex(Math.E);
     public static Complex PI = new Complex(Math.PI);
@@ -32,15 +23,14 @@ public class Complex {
 
     public Complex(String answer_) {
         answer = answer_;
+        re = 0;
         im = 0;
-        try {
-            re = Double.parseDouble(answer_);
-        } catch (Exception e) {
-            if (answer.indexOf("/") != -1)
-                re = new Expression(answer).value().val.re;
-            else
-                re = Double.NaN;
-        }
+    }
+
+    public Complex(String answer_, double re_) {
+        answer = answer_;
+        re = re_;
+        im = 0;
     }
 
     public Complex(boolean b) {

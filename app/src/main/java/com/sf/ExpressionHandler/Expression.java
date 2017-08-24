@@ -367,11 +367,16 @@ public class Expression {
             case Function.ROOT + 2:
                 return new Result(Complex.pow(val[0], new Complex(1 / val[1].re)));
             case Function.REDUC + 2:
+                if (val[0].re % 1 != 0 || val[1].re % 1 != 0)
+                    return new Result(1).append("参数必须是整数");
+                Complex div = Complex.div(val[0], val[1]);
+                if (div.isNaN() || div.re == 0 || Double.isInfinite(div.re))
+                    return new Result(new Complex(div.re));
                 Complex a = val[0].abs();
                 Complex b = val[1].abs();
                 double gcd = gcd(a, b).re;
                 String sign = (val[0].re < 0 || val[1].re < 0) && (val[0].re > 0 || val[1].re > 0) ? "-" : "";
-                return new Result(new Complex(sign + new Complex(a.re / gcd).toString() + "/" + new Complex(b.re / gcd).toString()));
+                return new Result(new Complex(sign + new Complex(a.re / gcd).toString() + "/" + new Complex(b.re / gcd).toString(), div.re));
             case Function.REMN + 2:
                 return new Result(new Complex(val[0].re % val[1].re));
             case Function.TODEG + 1:
@@ -403,15 +408,15 @@ public class Expression {
                 return new Result(new Complex(Complex.isOdd(val[0])));
             case Function.LCM + 2:
                 if (val[0].re % 1 != 0 || val[1].re % 1 != 0 || val[0].re <= 0 || val[1].re <= 0)
-                    return new Result(1).append("数字必须是正整数");
+                    return new Result(1).append("参数必须是正整数");
                 return new Result(lcm(val[0], val[1]));
             case Function.GCD + 2:
                 if (val[0].re % 1 != 0 || val[1].re % 1 != 0 || val[0].re <= 0 || val[1].re <= 0)
-                    return new Result(1).append("数字必须是正整数");
+                    return new Result(1).append("参数必须是正整数");
                 return new Result(gcd(val[0], val[1]));
             case Function.ISPRIME + 1:
                 if (val[0].re % 1 != 0 || val[0].re <= 0)
-                    return new Result(1).append("数字必须是正整数");
+                    return new Result(1).append("参数必须是正整数");
                 return new Result(isPrime(val[0]));
             case Function.PRIME + 1:
                 if (val[0].re % 1 != 0 || val[0].re <= 0)
@@ -1211,7 +1216,7 @@ public class Expression {
     }
 
     private Complex gcd(Complex c, Complex c2) {
-        int x = (int) c.re, y = (int) c2.re;
+        double x = c.re, y = c2.re;
         while (x != y) {
             if (!isWorking) return new Complex("已强制停止运算");
             if (x > y) x = x - y;
@@ -1221,7 +1226,7 @@ public class Expression {
     }
 
     private Complex lcm(Complex c, Complex c2) {
-        int x = (int) c.re, y = (int) c2.re;
+        double x = c.re, y = c2.re;
         Complex gcd = gcd(c, c2);
         if (gcd.toString().equals("已强制停止运算"))
             return gcd;
