@@ -371,12 +371,13 @@ public class Expression {
                     return new Result(1).append("参数必须是整数");
                 Complex div = Complex.div(val[0], val[1]);
                 if (div.isNaN() || div.re == 0 || Double.isInfinite(div.re))
-                    return new Result(new Complex(div.re));
+                    return new Result(div);
                 Complex a = val[0].abs();
                 Complex b = val[1].abs();
                 double gcd = gcd(a, b).re;
+                if (gcd == 0) return new Result(1).append("已强制停止运算");
                 String sign = (val[0].re < 0 || val[1].re < 0) && (val[0].re > 0 || val[1].re > 0) ? "-" : "";
-                return new Result(new Complex(sign + new Complex(a.re / gcd).toString() + "/" + new Complex(b.re / gcd).toString(), div.re));
+                return new Result(new Complex(sign + new Complex(a.re / gcd).toString() + "/" + new Complex(b.re / gcd).toString(), div));
             case Function.REMN + 2:
                 return new Result(new Complex(val[0].re % val[1].re));
             case Function.TODEG + 1:
@@ -423,7 +424,10 @@ public class Expression {
                     return new Result(1).append("寻找质数的参数必须是正整数");
                 return new Result(prime(val[0]));
             case Function.RECIPR + 1:
-                return new Result(new Complex(1 / val[0].re));
+                div = Complex.div(new Complex(1), val[0]);
+                if (div.isNaN() || div.re == 0 || Double.isInfinite(div.re))
+                    return new Result(div);
+                return new Result(new Complex("1/" + val[0].toString(), div));
             case Function.FACT + 1:
                 if (val[0].re % 1 != 0 || val[0].re < 0)
                     return new Result(1).append("阶乘函数的参数必须是自然数");

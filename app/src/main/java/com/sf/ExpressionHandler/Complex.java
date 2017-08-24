@@ -27,10 +27,10 @@ public class Complex {
         im = 0;
     }
 
-    public Complex(String answer_, double re_) {
+    public Complex(String answer_, Complex c) {
         answer = answer_;
-        re = re_;
-        im = 0;
+        re = c.re;
+        im = c.im;
     }
 
     public Complex(boolean b) {
