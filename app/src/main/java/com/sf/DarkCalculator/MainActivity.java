@@ -264,10 +264,6 @@ public class MainActivity extends BaseActivity {
                 @Override
                 public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                     String str = ((TextView) view.findViewById(R.id.text_item)).getText().toString();
-                    if (str.equals("reduc")) {
-                        Snackbar.make(view, "此函数还未完善", Snackbar.LENGTH_SHORT).show();
-                        return;
-                    }
                     Editable editable = inText.getText();
                     int index = inText.getSelectionStart();
                     editable.insert(index, str + s);
@@ -323,6 +319,7 @@ public class MainActivity extends BaseActivity {
             public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
                 String str = ((TextView) view.findViewById(R.id.text_vice_item)).getText().toString();
                 if (str.equals("CLR")) {
+                    ExpressionHandler.stop();
                     inText.setText(null);
                     return true;
                 }
@@ -422,8 +419,8 @@ public class MainActivity extends BaseActivity {
             @Override
             public void onTextChanged(final CharSequence s, int start, int before, int count) {
                 if (s.length() == 0) {
-                    ExpressionHandler.stop();
-                    stateText.setText(null);
+                    if (calcThread == null)
+                        stateText.setText(null);
                     outText.setTextColor(0xffbdbdbd);
                     outText.setText("···");
                     return;

@@ -6,6 +6,9 @@ package com.sf.ExpressionHandler;
  *
  */
 
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 public class Complex {
     public static Complex E = new Complex(Math.E);
     public static Complex PI = new Complex(Math.PI);
@@ -33,11 +36,16 @@ public class Complex {
         try {
             re = Double.parseDouble(answer_);
         } catch (Exception e) {
-            re = Double.NaN;
+            if (answer.indexOf("/") != -1)
+                re = new Expression(answer).value().val.re;
+            else
+                re = Double.NaN;
         }
     }
 
     public Complex(boolean b) {
+        re = 0;
+        im = 0;
         answer = b ? "true" : "false";
     }
 
@@ -192,7 +200,7 @@ public class Complex {
         return answer;
     }
 
-    //======================= Complex Functions ============================
+    //======================= Functions ============================
 
     public static Complex logab(Complex c, Complex c2) {
         return new Complex(log(c2).re / log(c).re);
@@ -200,52 +208,6 @@ public class Complex {
 
     public static boolean isOdd(Complex c) {
         return c.re % 2 != 0;
-    }
-
-
-    public static Complex gcd(Complex c, Complex c2) {
-        int x = (int) c.re, y = (int) c2.re;
-        while (x != y)
-            if (x > y) x = x - y;
-            else y = y - x;
-        return new Complex(x);
-    }
-
-    public static Complex lcm(Complex c, Complex c2) {
-        int x = (int) c.re, y = (int) c2.re;
-        return new Complex((x * y / gcd(c, c2).re));
-    }
-
-    public static boolean isPrime(Complex c) {
-        double x = c.re;
-        if (x == 1) return false;
-
-        for (int i = 2; i <= Math.sqrt(x); i++)
-            if (x % i == 0)
-                return false;
-        return true;
-    }
-
-    public static Complex prime(Complex c) {
-        double i = 2, j = 1, n = c.re;
-        while (true) {
-            j = j + 1;
-            if (j > i / j) {
-                n--;
-                if (n == 0)
-                    break;
-                j = 1;
-            }
-            if (i % j == 0) {
-                i++;
-                j = 1;
-            }
-        }
-        return new Complex(i);
-    }
-
-    public static Complex fact(Complex c) {
-        return new Complex(BigFactorial.calc((int) c.re));
     }
 
     public static Complex max(Complex c, Complex c2) {

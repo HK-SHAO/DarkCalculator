@@ -261,7 +261,7 @@ public class Expression {
                         if (r2.isFatalError()) {
                             if (r1.val.re % 1 != 0 || r1.val.re < 0)
                                 return new Result(1).append("阶乘只能作用于自然数");
-                            return new Result(Complex.fact(r1.val));
+                            return new Result(fact((int) r1.val.re));
                         }
                     default:
                         if (isOmitMult[i]) { // cached;
@@ -366,8 +366,12 @@ public class Expression {
         switch (funcJump) {
             case Function.ROOT + 2:
                 return new Result(Complex.pow(val[0], new Complex(1 / val[1].re)));
-            case Function.REDUC + 1:
-                return new Result(1).append("此函数还未完善");
+            case Function.REDUC + 2:
+                Complex a = val[0].abs();
+                Complex b = val[1].abs();
+                double gcd = gcd(a, b).re;
+                String sign = (val[0].re < 0 || val[1].re < 0) && (val[0].re > 0 || val[1].re > 0) ? "-" : "";
+                return new Result(new Complex(sign + new Complex(a.re / gcd).toString() + "/" + new Complex(b.re / gcd).toString()));
             case Function.REMN + 2:
                 return new Result(new Complex(val[0].re % val[1].re));
             case Function.TODEG + 1:
@@ -400,25 +404,25 @@ public class Expression {
             case Function.LCM + 2:
                 if (val[0].re % 1 != 0 || val[1].re % 1 != 0 || val[0].re <= 0 || val[1].re <= 0)
                     return new Result(1).append("数字必须是正整数");
-                return new Result(Complex.lcm(val[0], val[1]));
+                return new Result(lcm(val[0], val[1]));
             case Function.GCD + 2:
                 if (val[0].re % 1 != 0 || val[1].re % 1 != 0 || val[0].re <= 0 || val[1].re <= 0)
                     return new Result(1).append("数字必须是正整数");
-                return new Result(Complex.gcd(val[0], val[1]));
+                return new Result(gcd(val[0], val[1]));
             case Function.ISPRIME + 1:
                 if (val[0].re % 1 != 0 || val[0].re <= 0)
                     return new Result(1).append("数字必须是正整数");
-                return new Result(new Complex(Complex.isPrime(val[0])));
+                return new Result(isPrime(val[0]));
             case Function.PRIME + 1:
                 if (val[0].re % 1 != 0 || val[0].re <= 0)
                     return new Result(1).append("寻找质数的参数必须是正整数");
-                return new Result(Complex.prime(val[0]));
+                return new Result(prime(val[0]));
             case Function.RECIPR + 1:
                 return new Result(new Complex(1 / val[0].re));
             case Function.FACT + 1:
                 if (val[0].re % 1 != 0 || val[0].re < 0)
                     return new Result(1).append("阶乘函数的参数必须是自然数");
-                return new Result(Complex.fact(val[0]));
+                return new Result(fact((int) val[0].re));
             case Function.MAX + 2:
                 return new Result(Complex.max(val[0], val[1]));
             case Function.MIN + 2:
@@ -1189,9 +1193,7 @@ public class Expression {
                     break;
                 }
 
-                //System.out.println("h="+Double.toString(h)+" val="+res+" err="+e);
             }
-
             histRes.add(res);
         }
 
@@ -1206,6 +1208,119 @@ public class Expression {
         } else { // found
             return new Result(minRes);
         }
+    }
+
+    private Complex gcd(Complex c, Complex c2) {
+        int x = (int) c.re, y = (int) c2.re;
+        while (x != y) {
+            if (!isWorking) return new Complex("已强制停止运算");
+            if (x > y) x = x - y;
+            else y = y - x;
+        }
+        return new Complex(x);
+    }
+
+    private Complex lcm(Complex c, Complex c2) {
+        int x = (int) c.re, y = (int) c2.re;
+        Complex gcd = gcd(c, c2);
+        if (gcd.toString().equals("已强制停止运算"))
+            return gcd;
+        else
+            return new Complex((x * y / gcd.re));
+    }
+
+    private Complex isPrime(Complex c) {
+        double x = c.re;
+        if (x == 1) return new Complex(false);
+
+        for (int i = 2; i <= Math.sqrt(x); i++) {
+            if (x % i == 0)
+                return new Complex(false);
+        }
+        return new Complex(true);
+    }
+
+    private Complex prime(Complex c) {
+        double i = 2, j = 1, n = c.re;
+        while (true) {
+            if (!isWorking) return new Complex("已强制停止运算");
+            j = j + 1;
+            if (j > i / j) {
+                n--;
+                if (n == 0)
+                    break;
+                j = 1;
+            }
+            if (i % j == 0) {
+                i++;
+                j = 1;
+            }
+        }
+        return new Complex(i);
+    }
+
+    private void carry(int[] bit, int pos) {
+        int i, carray = 0;
+        for (i = 0; i <= pos; i++) {
+            bit[i] += carray;
+            if (bit[i] <= 9) {
+                carray = 0;
+            } else if (bit[i] > 9 && i < pos) {
+                carray = bit[i] / 10;
+                bit[i] = bit[i] % 10;
+            } else if (bit[i] > 9 && i >= pos) {
+                while (bit[i] > 9) {
+                    carray = bit[i] / 10;
+                    bit[i] = bit[i] % 10;
+                    i++;
+                    bit[i] = carray;
+                }
+            }
+        }
+    }
+
+    private Complex fact(int bigInteger) {
+        int pos = 0;
+        int digit;
+        int a, b;
+        double sum = 0;
+        for (a = 1; a <= bigInteger; a++) {
+            if (!isWorking) return new Complex("已强制停止运算");
+            sum += Math.log10(a);
+        }
+        digit = (int) sum + 1;
+
+        int[] fact = new int[digit];
+        fact[0] = 1;
+
+        for (a = 2; a <= bigInteger; a++) {
+            for (b = digit - 1; b >= 0; b--) {
+                if (fact[b] != 0) {
+                    pos = b;
+                    break;
+                }
+            }
+
+            for (b = 0; b <= pos; b++) {
+                if (!isWorking) return new Complex("已强制停止运算");
+                fact[b] *= a;
+            }
+            carry(fact, pos);
+        }
+
+        for (b = digit - 1; b >= 0; b--) {
+            if (fact[b] != 0) {
+                pos = b;
+                break;
+            }
+        }
+
+        StringBuffer sb = new StringBuffer();
+        for (a = pos; a >= 0; a--) {
+            if (!isWorking) return new Complex("已强制停止运算");
+            sb.append(fact[a]);
+        }
+        return new Complex(sb.toString());
     }
 
     public void stopEvaluation() {

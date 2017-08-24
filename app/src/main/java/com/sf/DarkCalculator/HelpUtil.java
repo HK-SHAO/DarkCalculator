@@ -61,7 +61,7 @@ public class HelpUtil {
         map.put("sign", "sign函数返回输入参数的正负性，若为正数返回1，若为0返回0，若为负数返回-1，需要1个参数");
         map.put("gamma", "gamma函数返回输入参数的欧拉第二积分，需要1个参数");
         map.put("remn", "remn函数返回输入参数的余数，需要2个参数，第1个参数为被除数，第2个参数为余数");
-        map.put("reduc", "reduc函数返回输入参数的的分数形式，需要1个参数");
+        map.put("reduc", "reduc函数返回输入参数的的最简分数形式，需要2个参数，第1个参数是分子，第2个参数是分母");
         map.put("prime", "prime函数返回第输入参数个的质数，需要1个参数");
         map.put("isPrime", "isPrime函数返回输入参数是否为质数，需要1个参数");
         map.put("isOdd", "isOdd函数返回输入参数是否为奇数，虽然没卵用，但还是需要1个参数");
