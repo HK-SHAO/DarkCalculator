@@ -15,6 +15,7 @@ import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.Toolbar;
 import android.text.Editable;
 import android.text.Spannable;
+import android.text.TextUtils;
 import android.text.TextWatcher;
 import android.text.style.ForegroundColorSpan;
 import android.view.Menu;
@@ -267,7 +268,7 @@ public class MainActivity extends BaseActivity {
                     Editable editable = inText.getText();
                     int index = inText.getSelectionStart();
                     editable.insert(index, str + s);
-                    if (s.length() != 0)
+                    if (!TextUtils.isEmpty(s))
                         inText.setSelection(index + str.length() + s.length() - 1);
                 }
             });
@@ -305,10 +306,13 @@ public class MainActivity extends BaseActivity {
                 Editable editable = inText.getText();
                 int index = inText.getSelectionStart();
                 if (str.equals("DEL")) {
-                    if (index == 0) {
-                        return;
+                    int index2 = inText.getSelectionEnd();
+                    if (index == index2) {
+                        if (index == 0) return;
+                        editable.delete(index - 1, index);
+                    } else {
+                        editable.delete(index, index2);
                     }
-                    editable.delete(index - 1, index);
                     return;
                 }
                 editable.insert(index, str);
@@ -346,37 +350,18 @@ public class MainActivity extends BaseActivity {
                 int index = inText.getSelectionStart();
                 if (str.equals("=")) {
                     if (calcThread != null) {
-                        Snackbar.make(view, "请等待运算完成", Snackbar.LENGTH_SHORT).show();
+                        Snackbar.make(view, "请等待此次运算完成", Snackbar.LENGTH_SHORT)
+                                .setAction("停止运算", new View.OnClickListener() {
+                                    @Override
+                                    public void onClick(View v) {
+                                        ExpressionHandler.stop();
+                                    }
+                                }).show();
                         return;
                     }
+                    outText.setText("···");
                     stateText.setText("运算中...");
-                    calcThread = new Thread(new Runnable() {
-                        @Override
-                        public void run() {
-                            final long t = System.currentTimeMillis();
-                            final String[] value = ExpressionHandler.calculation(inText.getText().toString());
-                            runOnUiThread(new Runnable() {
-                                @Override
-                                public void run() {
-                                    stateText.setText("运算结束，耗时 " + (System.currentTimeMillis() - t) + " 毫秒");
-                                    if (value[1].equals("true")) {
-                                        outText.setTextColor(0xffff4081);
-                                        outText.setText(value[0]);
-                                    } else {
-                                        outText.setTextColor(0xffbdbdbd);
-                                        Constants.constants.set(0, new String[]{"ans", value[0]});
-                                        if (value[0].getBytes().length > 1000) {
-                                            outText.setText("数值太大，请长按此处显示结果");
-                                            ResultsActivity.actionStart(context, value[0]);
-                                        } else
-                                            outText.setText(value[0]);
-                                    }
-                                    rootValue = value[0];
-                                    calcThread = null;
-                                }
-                            });
-                        }
-                    });
+                    calcThread = new Calc(inText.getText().toString());
                     calcThread.start();
                     return;
                 }
@@ -387,6 +372,67 @@ public class MainActivity extends BaseActivity {
         GridViewAdapter numericAdapter = new GridViewAdapter(this, numericBar, Arrays.asList(NUMERIC), R.layout.button_numeric);
         barAdapter.add(numericAdapter);
         numericBar.setAdapter(numericAdapter);
+    }
+
+    class FastCalc extends Thread implements Runnable {
+        private String exp;
+
+        public FastCalc(String exp) {
+            this.exp = exp;
+        }
+
+        @Override
+        public void run() {
+            final long t = System.currentTimeMillis();
+            final String[] value = ExpressionHandler.calculation(exp);
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    outText.setTextColor(0xffbdbdbd);
+                    stateText.setText("运算结束，耗时 " + (System.currentTimeMillis() - t) + " 毫秒");
+                    if (value[0].getBytes().length > 1000) {
+                        outText.setText("数值太大，请长按此处显示结果");
+                    } else
+                        outText.setText(value[0]);
+                    rootValue = value[0];
+                    calcThread = null;
+                }
+            });
+        }
+    }
+
+    class Calc extends Thread implements Runnable {
+        private String exp;
+
+        public Calc(String exp) {
+            this.exp = exp;
+        }
+
+        @Override
+        public void run() {
+            final long t = System.currentTimeMillis();
+            final String[] value = ExpressionHandler.calculation(exp);
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    stateText.setText("运算结束，耗时 " + (System.currentTimeMillis() - t) + " 毫秒");
+                    if (value[1].equals("true")) {
+                        outText.setTextColor(0xffff4081);
+                        outText.setText(value[0]);
+                    } else {
+                        outText.setTextColor(0xffbdbdbd);
+                        Constants.constants.set(0, new String[]{"ans", value[0]});
+                        if (value[0].getBytes().length > 1000) {
+                            outText.setText("数值太大，请长按此处显示结果");
+                            ResultsActivity.actionStart(context, value[0]);
+                        } else
+                            outText.setText(value[0]);
+                    }
+                    rootValue = value[0];
+                    calcThread = null;
+                }
+            });
+        }
     }
 
     private boolean modified = true;
@@ -417,8 +463,8 @@ public class MainActivity extends BaseActivity {
             }
 
             @Override
-            public void onTextChanged(final CharSequence s, int start, int before, int count) {
-                if (s.length() == 0) {
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                if (TextUtils.isEmpty(s)) {
                     if (calcThread == null)
                         stateText.setText(null);
                     outText.setTextColor(0xffbdbdbd);
@@ -427,26 +473,7 @@ public class MainActivity extends BaseActivity {
                 }
                 if (calcThread == null) {
                     stateText.setText("运算中...");
-                    calcThread = new Thread(new Runnable() {
-                        @Override
-                        public void run() {
-                            final long t = System.currentTimeMillis();
-                            final String[] value = ExpressionHandler.calculation(s.toString());
-                            runOnUiThread(new Runnable() {
-                                @Override
-                                public void run() {
-                                    outText.setTextColor(0xffbdbdbd);
-                                    stateText.setText("运算结束，耗时 " + (System.currentTimeMillis() - t) + " 毫秒");
-                                    if (value[0].getBytes().length > 1000) {
-                                        outText.setText("数值太大，请长按此处显示结果");
-                                    } else
-                                        outText.setText(value[0]);
-                                    rootValue = value[0];
-                                    calcThread = null;
-                                }
-                            });
-                        }
-                    });
+                    calcThread = new FastCalc(s.toString());
                     calcThread.start();
                 }
             }
@@ -456,7 +483,7 @@ public class MainActivity extends BaseActivity {
                 if (!modified) {
                     return;
                 }
-                selection = inText.getSelectionEnd();
+                selection = inText.getSelectionStart();
                 ForegroundColorSpan spans[] = s.getSpans(0, s.length(), ForegroundColorSpan.class);
                 for (int n = spans.length; n-- > 0; )
                     s.removeSpan(spans[n]);

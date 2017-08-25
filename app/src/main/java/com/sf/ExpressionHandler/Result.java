@@ -18,10 +18,6 @@ public class Result {
         err = err_;
     }
 
-    public Result(double d) {
-        val = new Complex(d);
-    }
-
     public Result append(String errorName) {
         val.setAnswer(errorName);
         return this;

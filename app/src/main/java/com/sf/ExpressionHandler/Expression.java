@@ -365,7 +365,7 @@ public class Expression {
         int funcJump = funcID + paramNum;
         switch (funcJump) {
             case Function.ROOT + 2:
-                return new Result(Complex.pow(val[0], new Complex(1 / val[1].re)));
+                return new Result(Complex.pow(val[0], Complex.div(new Complex(1), val[1])));
             case Function.REDUC + 2:
                 if (val[0].re % 1 != 0 || val[1].re % 1 != 0)
                     return new Result(1).append("参数必须是整数");
@@ -427,7 +427,7 @@ public class Expression {
                 div = Complex.div(new Complex(1), val[0]);
                 if (div.isNaN() || div.re == 0 || Double.isInfinite(div.re))
                     return new Result(div);
-                return new Result(new Complex("1/" + val[0].toString(), div));
+                return new Result(new Complex(("1/" + val[0].toString()).replaceAll("1/1/", ""), div));
             case Function.FACT + 1:
                 if (val[0].re % 1 != 0 || val[0].re < 0)
                     return new Result(1).append("阶乘函数的参数必须是自然数");
@@ -453,7 +453,7 @@ public class Expression {
             case Function.LOG + 2:
                 return new Result(Complex.logab(val[0], val[1]));
             case Function.CBRT + 1:
-                return new Result(Complex.cbrt(val[0]));
+                return new Result(Complex.pow(val[0], Complex.div(new Complex(1), new Complex(3))));
 
 
             case Function.EXP + 1:
