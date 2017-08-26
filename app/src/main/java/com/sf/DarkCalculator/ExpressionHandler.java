@@ -12,19 +12,25 @@ public class ExpressionHandler {
     private static Expression expression = null;
 
     public static String[] calculation(String response) {
-        String[] value;
         try {
             expression = new Expression(response);
             Result result = expression.value();
-            boolean isError = result.isFatalError();
+            expression = null;
             String val = result.val.toString();
-            value = new String[]{val, "" + isError};
+            switch (result.getError()) {
+                case 0:
+                    return new String[]{val, "false"};
+                case 1:
+                    return new String[]{val, "true"};
+                case 2:
+                    return new String[]{"已强制停止运算", "false"};
+                default:
+                    return new String[]{"···", "true"};
+            }
         } catch (Exception e) {
             e.printStackTrace();
-            value = new String[]{"···", "true"};
+            return new String[]{"···", "true"};
         }
-        expression = null;
-        return value;
     }
 
     public static void stop() {

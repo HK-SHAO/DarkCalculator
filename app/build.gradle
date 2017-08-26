@@ -10,10 +10,12 @@ android {
         versionCode 9
         versionName "1"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+        resConfigs "cn"
     }
     buildTypes {
         release {
             minifyEnabled true
+            shrinkResources true
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }

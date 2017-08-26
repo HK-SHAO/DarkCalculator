@@ -37,4 +37,8 @@ public class Result {
     public boolean isFatalError() {
         return err > 0;
     }
+
+    public int getError() {
+        return err;
+    }
 }

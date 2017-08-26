@@ -350,7 +350,7 @@ public class MainActivity extends BaseActivity {
                 int index = inText.getSelectionStart();
                 if (str.equals("=")) {
                     if (calcThread != null) {
-                        Snackbar.make(view, "请等待此次运算完成", Snackbar.LENGTH_SHORT)
+                        Snackbar.make(view, "请等待当前运算完成", Snackbar.LENGTH_SHORT)
                                 .setAction("停止运算", new View.OnClickListener() {
                                     @Override
                                     public void onClick(View v) {

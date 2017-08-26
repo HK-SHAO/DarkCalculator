@@ -23,7 +23,11 @@ public class Complex {
 
     public Complex(String answer_) {
         answer = answer_;
-        re = 0;
+        try {
+            re = Double.parseDouble(answer);
+        } catch (Exception e) {
+            re = 0;
+        }
         im = 0;
     }
 

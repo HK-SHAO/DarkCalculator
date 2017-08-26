@@ -139,7 +139,7 @@ public class Expression {
     // 0+NaN*I is never possible during a calculation
     // and is so used as "No Variable X provided" sign
     public Result value(int l, int r, Complex vX) {
-        if (!isWorking) return new Result(1).append("已强制停止运算");
+        if (!isWorking) return new Result(2);
 
         if (l > r) {
             return new Result(1).append("表达式语法错误");
@@ -375,7 +375,7 @@ public class Expression {
                 Complex a = val[0].abs();
                 Complex b = val[1].abs();
                 double gcd = gcd(a, b).re;
-                if (gcd == 0) return new Result(1).append("已强制停止运算");
+                if (gcd == 0) return new Result(2);
                 String sign = (val[0].re < 0 || val[1].re < 0) && (val[0].re > 0 || val[1].re > 0) ? "-" : "";
                 return new Result(new Complex(sign + new Complex(a.re / gcd).toString() + "/" + new Complex(b.re / gcd).toString(), div));
             case Function.REMN + 2:
@@ -693,7 +693,7 @@ public class Expression {
 
         for (int i = 0; i <= iter; i++) { // normally no more than 20 iter., but for eq. such as x^.2, more is needed.
 
-            if (!isWorking) return new Result(1).append("已强制停止运算");
+            if (!isWorking) return new Result(2);
 
             Complex d1 = Complex.mul(Complex.sub(x2, x1), r2);
             Complex d2 = Complex.sub(r2, r1);
@@ -748,7 +748,7 @@ public class Expression {
     Result solve(int l, int r, Complex x0) { // auto solver
         Result rp;
         for (double M = 1.0; M > 0.05; M *= 0.7) {
-            if (!isWorking) return new Result(1).append("已强制停止运算");
+            if (!isWorking) return new Result(2);
 
             rp = solve(l, r, x0, new Complex(M), (int) Math.round(1500 / Math.sqrt(M)));
             if (rp.isFatalError()) return rp;
@@ -824,7 +824,7 @@ public class Expression {
 
     Result adaptiveIntegrate(int l, int r, Complex x0, Complex x2, Complex lastSum, double TOL, int depth) {
 
-        if (!isWorking) return new Result(1).append("已强制停止运算");
+        if (!isWorking) return new Result(2);
 
         Complex x1;
 
@@ -935,7 +935,7 @@ public class Expression {
         }
         for (v.re = ds; v.re <= de; v.re += 1, cnt++) {
 
-            if (!isWorking) return new Result(1).append("已强制停止运算");
+            if (!isWorking) return new Result(2);
 
             v.im = (v.re - ds) * ratio + start.im;
             Result res = value(l, r, v);
