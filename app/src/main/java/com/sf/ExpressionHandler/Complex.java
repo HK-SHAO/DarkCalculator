@@ -1,5 +1,7 @@
 package com.sf.ExpressionHandler;
 
+import android.text.TextUtils;
+
 public class Complex {
     public static Complex E = new Complex(Math.E);
     public static Complex PI = new Complex(Math.PI);
@@ -156,7 +158,7 @@ public class Complex {
     }
 
     public String toString() {
-        if (answer.length() != 0 || answer.getBytes().length > 100)
+        if (!TextUtils.isEmpty(answer) || answer.getBytes().length > 100)
             return answer;
         double threshold = (Result.precision < Result.maxPrecision ? Math.pow(Result.base, -Result.precision) : 0);
         if (Double.isNaN(im) && Double.isInfinite(re)) {

@@ -24,7 +24,7 @@ public class Expression {
 
     private volatile boolean isWorking;
 
-    private static final String mathOperator = "+-*/^√×÷!";
+    private static final String mathOperator = "+-*/^√×÷";
     private static Complex memValue = new Complex(); // for memory function
 
     public Expression(String s) {
@@ -153,6 +153,9 @@ public class Expression {
         else if (s.equals("∞")) return new Result(Complex.Inf); // constant Infinity
         else if (s.equals("reg")) return new Result(memValue); // reg value
         else if (s.equals("°")) return new Result(new Complex(Math.PI / 180)); // degree value
+        else if (s.equals("!")) {
+
+        } // Factorial
         else if (s.equals("%")) return new Result(new Complex(0.01)); // percent value
         else if (s.equals("x")) {
             if (vX.isValid() || vX.isNaN())
@@ -210,14 +213,14 @@ public class Expression {
                 switch (ci) {
                     case '+':
                         r1 = value(l, i - 1, vX);
-                        r2 = value(i + 1, r, vX);
                         if (r1.isFatalError()) return r1;
+                        r2 = value(i + 1, r, vX);
                         if (r2.isFatalError()) return r2;
                         return new Result(Complex.add(r1.val, r2.val));
                     case '-':
                         r1 = value(l, i - 1, vX);
-                        r2 = value(i + 1, r, vX);
                         if (r1.isFatalError()) return r1;
+                        r2 = value(i + 1, r, vX);
                         if (r2.isFatalError()) return r2;
                         return new Result(Complex.sub(r1.val, r2.val));
                 }
@@ -243,38 +246,37 @@ public class Expression {
                     case '*':
                     case '×':
                         r1 = value(l, i - 1, vX);
-                        r2 = value(i + 1, r, vX);
                         if (r1.isFatalError()) return r1;
+                        r2 = value(i + 1, r, vX);
                         if (r2.isFatalError()) return r2;
                         return new Result(Complex.mul(r1.val, r2.val));
                     case '/':
                     case '÷':
                         r1 = value(l, i - 1, vX);
-                        r2 = value(i + 1, r, vX);
                         if (r1.isFatalError()) return r1;
+                        r2 = value(i + 1, r, vX);
                         if (r2.isFatalError()) return r2;
                         return new Result(Complex.div(r1.val, r2.val));
                     case '!':
                         r1 = value(l, i - 1, vX);
-                        r2 = value(i + 1, r, vX);
                         if (r1.isFatalError()) return r1;
-                        if (r2.isFatalError()) {
-                            if (r1.val.re % 1 != 0 || r1.val.re < 0)
-                                return new Result(1).append("阶乘只能作用于自然数");
-                            return new Result(fact((int) r1.val.re));
-                        }
+                        if (i != r)
+                            return new Result(1).append("无法计算 “" + s + "”");
+                        if (r1.val.re % 1 != 0 || r1.val.re < 0)
+                            return new Result(1).append("阶乘只能作用于自然数");
+                        return fact((int) r1.val.re);
                     default:
                         if (isOmitMult[i]) { // cached;
                             r1 = value(l, i - 1, vX);
-                            r2 = value(i, r, vX);
                             if (r1.isFatalError()) return r1;
+                            r2 = value(i, r, vX);
                             if (r2.isFatalError()) return r2;
                             return new Result(Complex.mul(r1.val, r2.val));
                         } else if (isOmitMult(i)) {
                             isOmitMult[i] = true;
                             r1 = value(l, i - 1, vX);
-                            r2 = value(i, r, vX);
                             if (r1.isFatalError()) return r1;
+                            r2 = value(i, r, vX);
                             if (r2.isFatalError()) return r2;
                             return new Result(Complex.mul(r1.val, r2.val));
                         }
@@ -282,8 +284,7 @@ public class Expression {
             }
         }
 
-        // Power (priority right->left)
-        for (int i = l; i <= r; i++)
+        for (int i = l; i <= r; i++) {
             if (br[i] == br[l] && text.charAt(i) == '^') {
                 Result r1 = value(l, i - 1, vX);
                 if (r1.isFatalError()) return r1;
@@ -291,6 +292,7 @@ public class Expression {
                 if (r2.isFatalError()) return r2;
                 return new Result(Complex.pow(r1.val, r2.val));
             }
+        }
 
         // Sqrt symbol
         if (text.charAt(l) == '√') {
@@ -374,7 +376,7 @@ public class Expression {
                     return new Result(div);
                 Complex a = val[0].abs();
                 Complex b = val[1].abs();
-                double gcd = gcd(a, b).re;
+                double gcd = gcd(a, b).val.re;
                 if (gcd == 0) return new Result(2);
                 String sign = (val[0].re < 0 || val[1].re < 0) && (val[0].re > 0 || val[1].re > 0) ? "-" : "";
                 return new Result(new Complex(sign + new Complex(a.re / gcd).toString() + "/" + new Complex(b.re / gcd).toString(), div));
@@ -410,11 +412,11 @@ public class Expression {
             case Function.LCM + 2:
                 if (val[0].re % 1 != 0 || val[1].re % 1 != 0 || val[0].re <= 0 || val[1].re <= 0)
                     return new Result(1).append("参数必须是正整数");
-                return new Result(lcm(val[0], val[1]));
+                return lcm(val[0], val[1]);
             case Function.GCD + 2:
                 if (val[0].re % 1 != 0 || val[1].re % 1 != 0 || val[0].re <= 0 || val[1].re <= 0)
                     return new Result(1).append("参数必须是正整数");
-                return new Result(gcd(val[0], val[1]));
+                return new Result(gcd(val[0], val[1]).val);
             case Function.ISPRIME + 1:
                 if (val[0].re % 1 != 0 || val[0].re <= 0)
                     return new Result(1).append("参数必须是正整数");
@@ -422,7 +424,7 @@ public class Expression {
             case Function.PRIME + 1:
                 if (val[0].re % 1 != 0 || val[0].re <= 0)
                     return new Result(1).append("寻找质数的参数必须是正整数");
-                return new Result(prime(val[0]));
+                return prime(val[0]);
             case Function.RECIPR + 1:
                 div = Complex.div(new Complex(1), val[0]);
                 if (div.isNaN() || div.re == 0 || Double.isInfinite(div.re))
@@ -431,7 +433,7 @@ public class Expression {
             case Function.FACT + 1:
                 if (val[0].re % 1 != 0 || val[0].re < 0)
                     return new Result(1).append("阶乘函数的参数必须是自然数");
-                return new Result(fact((int) val[0].re));
+                return fact((int) val[0].re);
             case Function.MAX + 2:
                 return new Result(Complex.max(val[0], val[1]));
             case Function.MIN + 2:
@@ -564,16 +566,16 @@ public class Expression {
         char ci = text.charAt(p);
         char cj = text.charAt(p - 1);
 
-        boolean iscjPreSymbol = (cj == ')' || cj == '∞' || cj == 'π' || cj == '°' || cj == '%');
+        boolean iscjPreSymbol = (cj == ')' || cj == '∞' || cj == 'π' || cj == '°' || cj == '!' || cj == '%');
         boolean iscjNumber = (cj >= '0' && cj <= '9' || cj == '.');
         boolean iscjBase = ParseNumber.isBaseSymbol(cj);
         boolean iscjFunc = (cj >= 'a' && cj <= 'z');
-        boolean isciNumber = (cj >= '0' && cj <= '9' || cj == '.');
+        boolean isciNumber = (ci >= '0' && ci <= '9' || ci == '.');
         //boolean isciBase=ParseNumber.isBaseSymbol(ci);
 
         boolean case1 = (ci >= 'a' && ci <= 'z' || ci == '(') && (iscjNumber || iscjPreSymbol || iscjBase);
         boolean case2 = (isciNumber) && (iscjPreSymbol || iscjFunc);
-        boolean case3 = (ci == '∞' || ci == 'π' || ci == '°' || ci == '%' || ci == '√') && (iscjNumber || iscjPreSymbol || iscjBase || iscjFunc);
+        boolean case3 = (ci == '∞' || ci == 'π' || ci == '°' || ci == '%' || ci == '√' || ci == '!') && (iscjNumber || iscjPreSymbol || iscjBase || iscjFunc);
 
         return case1 || case2 || case3;
     }
@@ -1219,23 +1221,23 @@ public class Expression {
         }
     }
 
-    private Complex gcd(Complex c, Complex c2) {
+    private Result gcd(Complex c, Complex c2) {
         double x = c.re, y = c2.re;
         while (x != y) {
-            if (!isWorking) return new Complex("已强制停止运算");
+            if (!isWorking) return new Result(2);
             if (x > y) x = x - y;
             else y = y - x;
         }
-        return new Complex(x);
+        return new Result(new Complex(x));
     }
 
-    private Complex lcm(Complex c, Complex c2) {
+    private Result lcm(Complex c, Complex c2) {
         double x = c.re, y = c2.re;
-        Complex gcd = gcd(c, c2);
-        if (gcd.toString().equals("已强制停止运算"))
+        Result gcd = gcd(c, c2);
+        if (gcd.getError() == 2)
             return gcd;
         else
-            return new Complex((x * y / gcd.re));
+            return new Result(new Complex((x * y / gcd.val.re)));
     }
 
     private Complex isPrime(Complex c) {
@@ -1249,10 +1251,10 @@ public class Expression {
         return new Complex(true);
     }
 
-    private Complex prime(Complex c) {
+    private Result prime(Complex c) {
         double i = 2, j = 1, n = c.re;
         while (true) {
-            if (!isWorking) return new Complex("已强制停止运算");
+            if (!isWorking) return new Result(2);
             j = j + 1;
             if (j > i / j) {
                 n--;
@@ -1265,7 +1267,7 @@ public class Expression {
                 j = 1;
             }
         }
-        return new Complex(i);
+        return new Result(new Complex(i));
     }
 
     private void carry(int[] bit, int pos) {
@@ -1288,13 +1290,13 @@ public class Expression {
         }
     }
 
-    private Complex fact(int bigInteger) {
+    private Result fact(int bigInteger) {
         int pos = 0;
         int digit;
         int a, b;
         double sum = 0;
         for (a = 1; a <= bigInteger; a++) {
-            if (!isWorking) return new Complex("已强制停止运算");
+            if (!isWorking) return new Result(2);
             sum += Math.log10(a);
         }
         digit = (int) sum + 1;
@@ -1311,7 +1313,7 @@ public class Expression {
             }
 
             for (b = 0; b <= pos; b++) {
-                if (!isWorking) return new Complex("已强制停止运算");
+                if (!isWorking) return new Result(2);
                 fact[b] *= a;
             }
             carry(fact, pos);
@@ -1326,10 +1328,10 @@ public class Expression {
 
         StringBuffer sb = new StringBuffer();
         for (a = pos; a >= 0; a--) {
-            if (!isWorking) return new Complex("已强制停止运算");
+            if (!isWorking) return new Result(2);
             sb.append(fact[a]);
         }
-        return new Complex(sb.toString());
+        return new Result(new Complex(sb.toString()));
     }
 
     public void stopEvaluation() {
