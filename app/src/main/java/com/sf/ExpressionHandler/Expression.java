@@ -153,9 +153,6 @@ public class Expression {
         else if (s.equals("∞")) return new Result(Complex.Inf); // constant Infinity
         else if (s.equals("reg")) return new Result(memValue); // reg value
         else if (s.equals("°")) return new Result(new Complex(Math.PI / 180)); // degree value
-        else if (s.equals("!")) {
-
-        } // Factorial
         else if (s.equals("%")) return new Result(new Complex(0.01)); // percent value
         else if (s.equals("x")) {
             if (vX.isValid() || vX.isNaN())
@@ -366,6 +363,16 @@ public class Expression {
 
         int funcJump = funcID + paramNum;
         switch (funcJump) {
+            case Function.CUST + 2:
+                if (val[0].re % 1 != 0 || val[0].re <= 0)
+                    return new Result(1).append("自定义的ID必须是正整数");
+                switch ((int) val[0].re) {
+                    case 1:
+                        MainActivity.preferences.edit().putBoolean("real", val[1].re == 1).apply();
+                        return new Result(0).append("设置成功，点击此处重启APP生效");
+                    default:
+                        return new Result(1).append("不存在此ID");
+                }
             case Function.ROOT + 2:
                 return new Result(Complex.pow(val[0], Complex.div(new Complex(1), val[1])));
             case Function.REDUC + 2:
@@ -404,7 +411,7 @@ public class Expression {
                 if (val[0].re <= 0)
                     return new Result(1).append("字体大小必须是正数");
                 MainActivity.preferences.edit().putFloat("textSize", (float) val[0].re).apply();
-                return new Result(0).append("设置成功，点击重启APP生效");
+                return new Result(0).append("设置成功，点击此处重启APP生效");
             case Function.SIGN + 1:
                 return new Result(new Complex(Math.signum(val[0].re)));
             case Function.ISODD + 1:

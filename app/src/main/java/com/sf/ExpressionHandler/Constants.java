@@ -23,6 +23,8 @@ public class Constants {
         list.add(new String[]{"me", "9.10938188E-31"});
         list.add(new String[]{"mn", "1.67262158E-27"});
         list.add(new String[]{"mp", "1.67492716E-27"});
+        list.add(new String[]{"false", "0"});
+        list.add(new String[]{"true", "1"});
         return list;
     }
 }

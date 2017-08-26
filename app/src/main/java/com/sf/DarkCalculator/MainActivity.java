@@ -58,6 +58,7 @@ public class MainActivity extends BaseActivity {
     private DrawerLayout drawer;
     private ArrayList<View> drawerPageList;
 
+    private boolean realTime;
     private HelpUtil helpUtil;
     private Pattern keywords;
     final private String[] OPERATOR = {"DEL", "÷", "×", "-", "+", "%", ",", "i"};
@@ -69,8 +70,8 @@ public class MainActivity extends BaseActivity {
                     "atan", "sinh", "cosh", "tanh", "asinh", "acosh", "atanh", "recipr",
                     "sum", "re", "im", "arg", "norm", "reg", "conj", "diff", "limit",
                     "eval", "fzero", "integ", "exp", "gcd", "lcm", "perm", "comb", "round",
-                    "floor", "ceil", "sign", "gamma", "remn", "reduc", "prime", "isPrime",
-                    "isOdd", "toDEG", "toRAD", "reStart", "setPrec", "setBase", "setCR", "setTS"},
+                    "floor", "ceil", "sign", "gamma", "remn", "reduc", "prime", "isPrime", "isOdd",
+                    "toDEG", "toRAD", "reStart", "setPrec", "setBase", "setCR", "setTS", "cust"},
             {"ans", "reg", "π", "e", "F", "h", "ћ", "γ", "φ", "c", "N", "R", "k", "G", "Φ", "me", "mn", "mp"}};
 
     final private String[][] FUNCTION_VICE = {
@@ -81,7 +82,7 @@ public class MainActivity extends BaseActivity {
                     "共轭复数", "导函数", "极限", "求值", "函数零点", "定积分", "e底指数",
                     "最大公约", "最小公倍", "排列", "组合", "四舍五入", "向下取整", "向上取整",
                     "取正负号", "伽玛函数", "取余", "分数化简", "质数", "判断质数", "判断奇数",
-                    "转角度", "转弧度", "重启APP", "输出精度", "输出进制", "排列方式", "字体大小"}, {
+                    "转角度", "转弧度", "重启APP", "输出精度", "输出进制", "排列方式", "字体大小", "自定义"}, {
             "上次运算", "寄存器", "圆周率", "自然底数", "法拉第", "普朗克", "约化普朗克", "欧拉", "黄金分割",
             "光速", "阿伏伽德罗", "理想气体", "玻尔兹曼", "万有引力", "磁通量子", "电子质量", "质子质量", "中子质量"}};
 
@@ -109,6 +110,7 @@ public class MainActivity extends BaseActivity {
         initOperator();
         initOperatorPro();
         initCR();
+        realTime = preferences.getBoolean("real", true);
     }
 
     private void initCR() {
@@ -148,6 +150,7 @@ public class MainActivity extends BaseActivity {
             public void onClick(View v) {
                 if (outText.getText().toString().indexOf("重启") != -1) {
                     inText.setText("reStart()");
+                    if (!realTime) new FastCalc("reStart()").start();
                     return;
                 }
                 ClipboardManager cmb = (ClipboardManager) context.getSystemService(Context.CLIPBOARD_SERVICE);
@@ -359,9 +362,15 @@ public class MainActivity extends BaseActivity {
                                 }).show();
                         return;
                     }
+                    String exp = inText.getText().toString();
+                    if (exp.equals("love")) {
+                        outText.setTextColor(0xfff06292);
+                        outText.setText("∞");
+                        return;
+                    }
                     outText.setText("···");
                     stateText.setText("运算中...");
-                    calcThread = new Calc(inText.getText().toString());
+                    calcThread = new Calc(exp);
                     calcThread.start();
                     return;
                 }
@@ -469,9 +478,11 @@ public class MainActivity extends BaseActivity {
                         stateText.setText(null);
                     outText.setTextColor(0xffbdbdbd);
                     outText.setText("···");
+                    rootValue = null;
                     return;
                 }
-                if (calcThread == null) {
+                if (!realTime) outText.setText("···");
+                if (calcThread == null && realTime) {
                     stateText.setText("运算中...");
                     calcThread = new FastCalc(s.toString());
                     calcThread.start();
