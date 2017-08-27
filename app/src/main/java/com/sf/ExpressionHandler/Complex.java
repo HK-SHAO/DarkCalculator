@@ -199,7 +199,7 @@ public class Complex {
     //======================= Functions ============================
 
     public static Complex logab(Complex c, Complex c2) {
-        return new Complex(log(c2).re / log(c).re);
+        return div(ln(c2), ln(c));
     }
 
     public static boolean isOdd(Complex c) {
@@ -215,38 +215,31 @@ public class Complex {
     }
 
     public static Complex sinh(Complex c) {
-        return new Complex(Math.sinh(c.re));
+        return div(sub(exp(c), exp(mul(new Complex(-1), c))), new Complex(2));
     }
 
     public static Complex cosh(Complex c) {
-        return new Complex(Math.cosh(c.re));
+        return div(add(exp(c), exp(mul(new Complex(-1), c))), new Complex(2));
     }
 
     public static Complex tanh(Complex c) {
-        return new Complex(Math.tanh(c.re));
+        return div(sinh(c), cosh(c));
     }
 
     public static Complex asinh(Complex c) {
-        double x = c.re;
-        return new Complex(Math.log(x + Math.sqrt(x * x + 1)));
+        return new Complex(Math.log(c.re + Math.sqrt(c.re * c.re + 1)));
     }
 
     public static Complex acosh(Complex c) {
-        double x = c.re;
-        return new Complex(Math.log(x + Math.sqrt(x * x - 1)));
+        return new Complex(Math.log(c.re + Math.sqrt(c.re * c.re - 1)));
     }
 
     public static Complex atanh(Complex c) {
-        double x = c.re;
-        return new Complex(0.5 * Math.log((x + 1) / (x - 1)));
+        return new Complex(0.5 * Math.log((c.re + 1) / (c.re - 1)));
     }
 
     public static Complex ln(Complex c) {
         return new Complex(Math.log(c.norm().re), c.arg().re);
-    }
-
-    public static Complex cbrt(Complex c) {
-        return new Complex(Math.cbrt(c.re));
     }
 
     public static Complex exp(Complex c) {
@@ -257,9 +250,7 @@ public class Complex {
     }
 
     public static Complex log(Complex c) {
-        if (c.re == 0 && c.im == 0)
-            return Complex.inv(Inf);
-        return new Complex(Math.log10(c.norm().re));
+        return div(ln(c), ln(new Complex(10)));
     }
 
     public static Complex sqrt(Complex c) {

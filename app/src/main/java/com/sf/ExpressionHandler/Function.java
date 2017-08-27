@@ -113,7 +113,7 @@ class Function {
             new Serial("rand", RAND),
             new Serial("round", ROUND),
             new Serial("diff", DIFF, 1),
-            new Serial("limit", LIMIT, 1),
+            new Serial("lim", LIMIT, 1),
             new Serial("eval", EVAL, 1),
             new Serial("fzero", FZERO, 1),
             new Serial("integ", INTEG, 1),

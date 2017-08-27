@@ -68,7 +68,7 @@ public class MainActivity extends BaseActivity {
             {"sqrt", "cbrt", "root", "rand", "randInt", "lg", "ln", "log",
                     "abs", "min", "max", "fact", "sin", "cos", "tan", "asin", "acos",
                     "atan", "sinh", "cosh", "tanh", "asinh", "acosh", "atanh", "recipr",
-                    "sum", "re", "im", "arg", "norm", "reg", "conj", "diff", "limit",
+                    "sum", "re", "im", "arg", "norm", "reg", "conj", "diff", "lim",
                     "eval", "fzero", "integ", "exp", "gcd", "lcm", "perm", "comb", "round",
                     "floor", "ceil", "sign", "gamma", "remn", "reduc", "prime", "isPrime", "isOdd",
                     "toDEG", "toRAD", "reStart", "setPrec", "setBase", "setCR", "setTS", "cust"},
