@@ -24,6 +24,8 @@ public class ExpressionHandler {
                     return new String[]{val, "true"};
                 case 2:
                     return new String[]{"已强制停止运算", "false"};
+                case 3:
+                    return new String[]{"函数不支持复数", "true"};
                 default:
                     return new String[]{"···", "true"};
             }

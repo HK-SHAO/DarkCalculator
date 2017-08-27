@@ -8,6 +8,7 @@ public class Complex {
     public static Complex I = new Complex(0, 1);
     public static Complex Inf = new Complex(Double.POSITIVE_INFINITY, Double.NaN);
 
+    public int err = 0;
     public double re;
     public double im;
 
@@ -28,7 +29,7 @@ public class Complex {
         try {
             re = Double.parseDouble(answer);
         } catch (Exception e) {
-            re = 0;
+            re = Double.NaN;
         }
         im = 0;
     }
@@ -40,7 +41,7 @@ public class Complex {
     }
 
     public Complex(boolean b) {
-        re = 0;
+        re = b ? 1 : 0;
         im = 0;
         answer = b ? "true" : "false";
     }
@@ -48,6 +49,11 @@ public class Complex {
     public Complex() {
         re = Double.NaN;
         im = Double.NaN;
+    }
+
+    public Complex error(int err) {
+        this.err = err;
+        return this;
     }
 
     public void setAnswer(String str) {
@@ -202,15 +208,21 @@ public class Complex {
         return div(ln(c2), ln(c));
     }
 
-    public static boolean isOdd(Complex c) {
-        return c.re % 2 != 0;
+    public static Complex isOdd(Complex c) {
+        if (c.im != 0)
+            return new Complex().error(3);
+        return new Complex(c.re % 2 != 0 ? true : false);
     }
 
     public static Complex max(Complex c, Complex c2) {
+        if (c.im != 0 || c2.im != 0)
+            return new Complex().error(3);
         return new Complex(Math.max(c.re, c2.re));
     }
 
     public static Complex min(Complex c, Complex c2) {
+        if (c.im != 0 || c2.im != 0)
+            return new Complex().error(3);
         return new Complex(Math.min(c.re, c2.re));
     }
 
@@ -227,14 +239,20 @@ public class Complex {
     }
 
     public static Complex asinh(Complex c) {
+        if (c.im != 0)
+            return new Complex("此函数不支持复数运算");
         return new Complex(Math.log(c.re + Math.sqrt(c.re * c.re + 1)));
     }
 
     public static Complex acosh(Complex c) {
+        if (c.im != 0)
+            return new Complex("此函数不支持复数运算");
         return new Complex(Math.log(c.re + Math.sqrt(c.re * c.re - 1)));
     }
 
     public static Complex atanh(Complex c) {
+        if (c.im != 0)
+            return new Complex("此函数不支持复数运算");
         return new Complex(0.5 * Math.log((c.re + 1) / (c.re - 1)));
     }
 

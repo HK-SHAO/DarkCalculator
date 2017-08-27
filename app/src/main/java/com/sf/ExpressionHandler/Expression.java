@@ -261,7 +261,7 @@ public class Expression {
                             return new Result(1).append("无法计算 “" + s + "”");
                         if (r1.val.re % 1 != 0 || r1.val.re < 0)
                             return new Result(1).append("阶乘只能作用于自然数");
-                        return fact((int) r1.val.re);
+                        return fact(r1.val);
                     default:
                         if (isOmitMult[i]) { // cached;
                             r1 = value(l, i - 1, vX);
@@ -415,7 +415,7 @@ public class Expression {
             case Function.SIGN + 1:
                 return new Result(new Complex(Math.signum(val[0].re)));
             case Function.ISODD + 1:
-                return new Result(new Complex(Complex.isOdd(val[0])));
+                return new Result(Complex.isOdd(val[0]));
             case Function.LCM + 2:
                 if (val[0].re % 1 != 0 || val[1].re % 1 != 0 || val[0].re <= 0 || val[1].re <= 0)
                     return new Result(1).append("参数必须是正整数");
@@ -423,7 +423,7 @@ public class Expression {
             case Function.GCD + 2:
                 if (val[0].re % 1 != 0 || val[1].re % 1 != 0 || val[0].re <= 0 || val[1].re <= 0)
                     return new Result(1).append("参数必须是正整数");
-                return new Result(gcd(val[0], val[1]).val);
+                return gcd(val[0], val[1]);
             case Function.ISPRIME + 1:
                 if (val[0].re % 1 != 0 || val[0].re <= 0)
                     return new Result(1).append("参数必须是正整数");
@@ -440,7 +440,7 @@ public class Expression {
             case Function.FACT + 1:
                 if (val[0].re % 1 != 0 || val[0].re < 0)
                     return new Result(1).append("阶乘函数的参数必须是自然数");
-                return fact((int) val[0].re);
+                return fact(val[0]);
             case Function.MAX + 2:
                 return new Result(Complex.max(val[0], val[1]));
             case Function.MIN + 2:
@@ -1229,6 +1229,8 @@ public class Expression {
     }
 
     private Result gcd(Complex c, Complex c2) {
+        if (c.im != 0 || c2.im != 0)
+            return new Result(3);
         double x = c.re, y = c2.re;
         while (x != y) {
             if (!isWorking) return new Result(2);
@@ -1239,6 +1241,8 @@ public class Expression {
     }
 
     private Result lcm(Complex c, Complex c2) {
+        if (c.im != 0 || c2.im != 0)
+            return new Result(3);
         double x = c.re, y = c2.re;
         Result gcd = gcd(c, c2);
         if (gcd.getError() == 2)
@@ -1248,6 +1252,8 @@ public class Expression {
     }
 
     private Complex isPrime(Complex c) {
+        if (c.im != 0)
+            return new Complex().error(3);
         double x = c.re;
         if (x == 1) return new Complex(false);
 
@@ -1259,6 +1265,8 @@ public class Expression {
     }
 
     private Result prime(Complex c) {
+        if (c.im != 0)
+            return new Result(3);
         double i = 2, j = 1, n = c.re;
         while (true) {
             if (!isWorking) return new Result(2);
@@ -1297,7 +1305,10 @@ public class Expression {
         }
     }
 
-    private Result fact(int bigInteger) {
+    private Result fact(Complex c) {
+        if (c.im != 0)
+            return new Result(3);
+        int bigInteger = (int) c.re;
         int pos = 0;
         int digit;
         int a, b;

@@ -10,7 +10,7 @@ public class Result {
 
     public Result(Complex v) {
         val = v;
-        err = 0;
+        err = v.err;
     }
 
     public Result(int err_) {
