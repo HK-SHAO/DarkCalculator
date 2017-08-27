@@ -72,7 +72,7 @@ public class MainActivity extends BaseActivity {
                     "eval", "fzero", "integ", "exp", "gcd", "lcm", "perm", "comb", "round",
                     "floor", "ceil", "sign", "gamma", "remn", "reduc", "prime", "isPrime", "isOdd",
                     "toDEG", "toRAD", "reStart", "setPrec", "setBase", "setCR", "setTS", "cust"},
-            {"ans", "reg", "π", "e", "F", "h", "ћ", "γ", "φ", "c", "N", "R", "k", "G", "Φ", "me", "mn", "mp"}};
+            {"ans", "reg", "π", "e", "F", "h", "ћ", "γ", "φ", "c", "N", "R", "k", "G", "Φ", "me", "mn", "mp", "true", "false"}};
 
     final private String[][] FUNCTION_VICE = {
             {"平方根", "立方根", "开方", "随机复数", "随机整数", "常用对数", "自然对数", "对数",
@@ -84,7 +84,7 @@ public class MainActivity extends BaseActivity {
                     "取正负号", "伽玛函数", "取余", "分数化简", "质数", "判断质数", "判断奇数",
                     "转角度", "转弧度", "重启APP", "输出精度", "输出进制", "排列方式", "字体大小", "自定义"}, {
             "上次运算", "寄存器", "圆周率", "自然底数", "法拉第", "普朗克", "约化普朗克", "欧拉", "黄金分割",
-            "光速", "阿伏伽德罗", "理想气体", "玻尔兹曼", "万有引力", "磁通量子", "电子质量", "质子质量", "中子质量"}};
+            "光速", "阿伏伽德罗", "理想气体", "玻尔兹曼", "万有引力", "磁通量子", "电子质量", "质子质量", "中子质量", "真", "假"}};
 
     final private String[] FUNCTION_LIST = {"科学计算", "大数计算", "时间计算", "进制转换",
             "方程式配平", "分子量计算", "亲戚关系计算", "大写数字", "汇率转换", "单位转换"};
