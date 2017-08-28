@@ -80,6 +80,8 @@ public class Complex {
     }
 
     public Complex abs() {
+        if (im != 0)
+            return new Complex().error(3);
         return new Complex(Math.abs(re));
     }
 
@@ -211,7 +213,7 @@ public class Complex {
     public static Complex isOdd(Complex c) {
         if (c.im != 0)
             return new Complex().error(3);
-        return new Complex(c.re % 2 != 0 ? true : false);
+        return new Complex(c.re % 2 != 0);
     }
 
     public static Complex max(Complex c, Complex c2) {
@@ -240,19 +242,19 @@ public class Complex {
 
     public static Complex asinh(Complex c) {
         if (c.im != 0)
-            return new Complex("此函数不支持复数运算");
+            return new Complex().error(3);
         return new Complex(Math.log(c.re + Math.sqrt(c.re * c.re + 1)));
     }
 
     public static Complex acosh(Complex c) {
         if (c.im != 0)
-            return new Complex("此函数不支持复数运算");
+            return new Complex().error(3);
         return new Complex(Math.log(c.re + Math.sqrt(c.re * c.re - 1)));
     }
 
     public static Complex atanh(Complex c) {
         if (c.im != 0)
-            return new Complex("此函数不支持复数运算");
+            return new Complex().error(3);
         return new Complex(0.5 * Math.log((c.re + 1) / (c.re - 1)));
     }
 
@@ -280,6 +282,10 @@ public class Complex {
         if (c.im < 0) sind2 = -sind2;
         norm = Math.sqrt(norm);
         return new Complex(norm * cosd2, norm * sind2);
+    }
+
+    public static Complex cbrt(Complex c) {
+        return pow(c, div(new Complex(1), new Complex(3)));
     }
 
     public static Complex sin(Complex c) {

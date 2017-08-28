@@ -364,6 +364,8 @@ public class Expression {
         int funcJump = funcID + paramNum;
         switch (funcJump) {
             case Function.CUST + 2:
+                if (val[0].im != 0 || val[1].im != 0)
+                    return new Result(3);
                 if (val[0].re % 1 != 0 || val[0].re <= 0)
                     return new Result(1).append("自定义的ID必须是正整数");
                 switch ((int) val[0].re) {
@@ -378,28 +380,26 @@ public class Expression {
             case Function.REDUC + 2:
                 if (val[0].re % 1 != 0 || val[1].re % 1 != 0)
                     return new Result(1).append("参数必须是整数");
-                Complex div = Complex.div(val[0], val[1]);
-                if (div.isNaN() || div.re == 0 || Double.isInfinite(div.re))
-                    return new Result(div);
-                Complex a = val[0].abs();
-                Complex b = val[1].abs();
-                double gcd = gcd(a, b).val.re;
-                if (gcd == 0) return new Result(2);
-                String sign = (val[0].re < 0 || val[1].re < 0) && (val[0].re > 0 || val[1].re > 0) ? "-" : "";
-                return new Result(new Complex(sign + new Complex(a.re / gcd).toString() + "/" + new Complex(b.re / gcd).toString(), div));
+                return reduc(val[0], val[1]);
             case Function.REMN + 2:
+                if (val[0].im != 0 || val[1].im != 0)
+                    return new Result(3);
                 return new Result(new Complex(val[0].re % val[1].re));
             case Function.TODEG + 1:
-                return new Result(new Complex(val[0].re * 180 / Math.PI));
+                return new Result(Complex.div(val[0], new Complex(Math.PI / 180)));
             case Function.TORAD + 1:
-                return new Result(new Complex(val[0].re * Math.PI / 180));
+                return new Result(Complex.mul(val[0], new Complex(Math.PI / 180)));
             case Function.RANDINT + 2:
+                if (val[0].im != 0 || val[1].im != 0)
+                    return new Result(3);
                 return new Result(new Complex(Math.floor(val[0].re + Math.random() * (val[1].re - val[0].re))));
             case Function.RESTART:
                 MainActivity.activity.finish();
                 MainActivity.actionStart(MainActivity.activity);
                 return new Result(0).append("正在重启中");
             case Function.SETCR + 3:
+                if (val[0].im != 0 || val[1].im != 0 || val[2].im != 0)
+                    return new Result(3);
                 double x = val[0].re;
                 double y = val[1].re;
                 double z = val[2].re;
@@ -408,11 +408,15 @@ public class Expression {
                 MainActivity.activity.setBarCR((int) x, (int) y, (int) z);
                 return new Result(0).append("设置成功");
             case Function.SETTS + 1:
+                if (val[0].im != 0)
+                    return new Result(3);
                 if (val[0].re <= 0)
                     return new Result(1).append("字体大小必须是正数");
                 MainActivity.preferences.edit().putFloat("textSize", (float) val[0].re).apply();
                 return new Result(0).append("设置成功，点击此处重启APP生效");
             case Function.SIGN + 1:
+                if (val[0].im != 0)
+                    return new Result(3);
                 return new Result(new Complex(Math.signum(val[0].re)));
             case Function.ISODD + 1:
                 return new Result(Complex.isOdd(val[0]));
@@ -433,10 +437,9 @@ public class Expression {
                     return new Result(1).append("寻找质数的参数必须是正整数");
                 return prime(val[0]);
             case Function.RECIPR + 1:
-                div = Complex.div(new Complex(1), val[0]);
-                if (div.isNaN() || div.re == 0 || Double.isInfinite(div.re))
-                    return new Result(div);
-                return new Result(new Complex(("1/" + val[0].toString()).replaceAll("1/1/", ""), div));
+                if (val[0].re % 1 != 0)
+                    return new Result(1).append("参数必须是整数");
+                return reduc(new Complex(1), val[0]);
             case Function.FACT + 1:
                 if (val[0].re % 1 != 0 || val[0].re < 0)
                     return new Result(1).append("阶乘函数的参数必须是自然数");
@@ -462,7 +465,7 @@ public class Expression {
             case Function.LOG + 2:
                 return new Result(Complex.logab(val[0], val[1]));
             case Function.CBRT + 1:
-                return new Result(Complex.pow(val[0], Complex.div(new Complex(1), new Complex(3))));
+                return new Result(Complex.cbrt(val[0]));
 
 
             case Function.EXP + 1:
@@ -546,6 +549,8 @@ public class Expression {
                 Result.setBase(Result.base);
                 return new Result(0).append("精度设置为 " + Result.precision + " 位小数");
             case Function.PREC + 1:
+                if (val[0].im != 0)
+                    return new Result(3);
                 int prec = (int) Math.round(val[0].re);
                 if (prec < 0)
                     return new Result(1).setVal(new Complex(1)).append("精度过低");
@@ -558,6 +563,8 @@ public class Expression {
                 Result.setBase(10);
                 return new Result(0).append("输出进制被设置为" + 10 + " 进制，" + "精度为 " + Result.precision + " 位小数");
             case Function.BASE + 1:
+                if (val[0].im != 0)
+                    return new Result(3);
                 int base = (int) Math.round(val[0].re);
                 if (!(base >= 2 && base <= 10 || base == 12 || base == 16))
                     return new Result(1).setVal(new Complex(1)).append("函数的参数无效");
@@ -1350,6 +1357,21 @@ public class Expression {
             sb.append(fact[a]);
         }
         return new Result(new Complex(sb.toString()));
+    }
+
+    private Result reduc(Complex c, Complex c2) {
+        if (c.im != 0 || c2.im != 0)
+            return new Result(3);
+        Complex div = Complex.div(c, c2);
+        if (div.isNaN() || div.re == 0 || Double.isInfinite(div.re))
+            return new Result(div);
+        Complex a = c.abs();
+        Complex b = c2.abs();
+        Result g = gcd(a, b);
+        if (g.getError() == 2) return new Result(2);
+        double gcd = g.val.re;
+        String sign = (c.re < 0 || c2.re < 0) && (c.re > 0 || c2.re > 0) ? "-" : "";
+        return new Result(new Complex(sign + new Complex(a.re / gcd).toString() + "/" + new Complex(b.re / gcd).toString(), div));
     }
 
     public void stopEvaluation() {
