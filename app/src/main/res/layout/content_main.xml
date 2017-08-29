@@ -19,10 +19,14 @@
         android:layout_weight="1.0"
         android:background="#757575" />
 
-    <FrameLayout
-        android:layout_width="14dp"
+
+    <ImageView
+        android:id="@+id/drawer_right"
+        android:layout_width="20dp"
         android:layout_height="match_parent"
         android:background="#bdbdbd"
-        android:elevation="4dp" />
+        android:elevation="4dp"
+        android:gravity="center"
+        android:src="@drawable/ic_left" />
 
 </LinearLayout>

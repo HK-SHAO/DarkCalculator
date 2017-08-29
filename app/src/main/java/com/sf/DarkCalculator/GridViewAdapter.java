@@ -66,13 +66,13 @@ public class GridViewAdapter extends BaseAdapter {
 
         String text = this.text.get(position);
         if (text.equals("DEL"))
-            viewHolder.title.setTextSize(22);
+            viewHolder.title.setTextSize(20);
         viewHolder.title.setText(text);
 
         if (viceText != null) {
             String text2 = viceText.get(position);
             if (text2.equals("CLR"))
-                viewHolder.vice.setTextSize(12);
+                viewHolder.vice.setTextSize(10);
             viewHolder.vice.setText(text2);
         }
 

@@ -111,6 +111,12 @@ public class MainActivity extends BaseActivity {
         initOperatorPro();
         initCR();
         realTime = preferences.getBoolean("real", true);
+        findViewById(R.id.drawer_right).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                drawer.openDrawer(GravityCompat.END);
+            }
+        });
     }
 
     private void initCR() {
@@ -362,15 +368,9 @@ public class MainActivity extends BaseActivity {
                                 }).show();
                         return;
                     }
-                    String exp = inText.getText().toString();
-                    if (exp.equals("love")) {
-                        outText.setTextColor(0xfff06292);
-                        outText.setText("∞");
-                        return;
-                    }
                     outText.setText("···");
                     stateText.setText("运算中...");
-                    calcThread = new Calc(exp);
+                    calcThread = new Calc(inText.getText().toString());
                     calcThread.start();
                     return;
                 }
@@ -491,9 +491,8 @@ public class MainActivity extends BaseActivity {
 
             @Override
             public void afterTextChanged(Editable s) {
-                if (!modified) {
-                    return;
-                }
+                if (!modified) return;
+
                 selection = inText.getSelectionStart();
                 ForegroundColorSpan spans[] = s.getSpans(0, s.length(), ForegroundColorSpan.class);
                 for (int n = spans.length; n-- > 0; )

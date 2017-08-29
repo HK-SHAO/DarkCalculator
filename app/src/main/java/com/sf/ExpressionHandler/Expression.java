@@ -419,6 +419,8 @@ public class Expression {
                     return new Result(3);
                 return new Result(new Complex(Math.signum(val[0].re)));
             case Function.ISODD + 1:
+                if (val[0].re % 1 != 0)
+                    return new Result(1).append("参数必须是整数");
                 return new Result(Complex.isOdd(val[0]));
             case Function.LCM + 2:
                 if (val[0].re % 1 != 0 || val[1].re % 1 != 0 || val[0].re <= 0 || val[1].re <= 0)
@@ -437,9 +439,7 @@ public class Expression {
                     return new Result(1).append("寻找质数的参数必须是正整数");
                 return prime(val[0]);
             case Function.RECIPR + 1:
-                if (val[0].re % 1 != 0)
-                    return new Result(1).append("参数必须是整数");
-                return reduc(new Complex(1), val[0]);
+                return new Result(Complex.div(new Complex(1), val[0]));
             case Function.FACT + 1:
                 if (val[0].re % 1 != 0 || val[0].re < 0)
                     return new Result(1).append("阶乘函数的参数必须是自然数");
@@ -1149,8 +1149,6 @@ public class Expression {
                     if (overErrorRangeCount > 20) {
                         break;
                     }
-
-                    //System.out.println("h="+Double.toString(h)+" err="+e);
                 }
 
                 histRes.add(res);
@@ -1173,8 +1171,6 @@ public class Expression {
         for (int i = 0; i < validSect; i++) {
             limitVar += Complex.sub(limitRes[i], limitSum).norm2();
         }
-
-        //Log.i("Limit","Dvar="+limitVar);
 
         Result res = new Result(limitSum);
         if (limitVar > 1E-5) {
@@ -1226,7 +1222,6 @@ public class Expression {
             return new Result(1).append("函数在给定点上可能没有收敛");
         }
         Complex minRes = histRes.get(minPos - 1);
-        //Log.i("Limit","err="+minDe);
 
         if (minDe > 1E-5) { // didn't found ?
             return new Result(1).append("函数在给定点上可能没有收敛");
