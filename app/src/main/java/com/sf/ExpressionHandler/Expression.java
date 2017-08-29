@@ -14,13 +14,66 @@ public class Expression {
     private int[] funcSer; // the function interpreted
     private int brDiff; // the difference of ( and )
 
-    // Cache number parsing result, reduce time consumption
-    private int[] numberParseRPos; // Where does a number starts at a position end? -1 for not a number start.
-    private double[] numberParseResult; // The value of a number starts at a position
+    // Cache interpretation result
+    private class SymbolCachePair {
+        static final int SYMBOL_NUM = 0; // may cache value
+        static final int SYMBOL_ADD = 1;
+        static final int SYMBOL_POS = 2;
+        static final int SYMBOL_SUB = 3;
+        static final int SYMBOL_NEG = 4;
+        static final int SYMBOL_MUL = 5;
+        static final int SYMBOL_DIV = 6;
+        static final int SYMBOL_MUL_OMIT = 7;
+        static final int SYMBOL_POW = 8;
+        static final int SYMBOL_SQRT = 9;
+        static final int SYMBOL_CONST = 10; // may cache value
+        static final int SYMBOL_FUNC = 11;
+        static final int SYMBOL_VAR = 12; // Temporarily not used
+        static final int SYMBOL_BRACKET = 13;
+        static final int SYMBOL_FACT = 14;
 
-    // Cache symbol parsing result
-    private int[] isAddSubParseResult; // is this an add/sub symbol ?
-    private boolean[] isOmitMult; // is '*' omitted here ?
+        int end_pos;
+        int symbol;
+        int symbol_pos;
+        Complex cachedValue;
+
+        SymbolCachePair(int end_pos_, int symbol_, int symbol_pos_, Complex cachedValue_) {
+            end_pos = end_pos_;
+            symbol = symbol_;
+            symbol_pos = symbol_pos_;
+            cachedValue = cachedValue_;
+        }
+    }
+
+    private class SymbolCache {
+        List<SymbolCachePair> list;
+
+        SymbolCache() {
+            list = new ArrayList<>();
+        }
+
+        void submit(int end_pos_, int symbol_, int symbol_pos_) {
+            list.add(new SymbolCachePair(end_pos_, symbol_, symbol_pos_, new Complex()));
+            //Log.i("expression","Submit pos="+symbol_pos_+" type="+symbol_);
+        }
+
+        void submit(int end_pos_, int symbol_, Complex cachedValue_) {
+            list.add(new SymbolCachePair(end_pos_, symbol_, -1, cachedValue_));
+            //Log.i("expression","Submit val="+cachedValue_+" type="+symbol_);
+        }
+
+        SymbolCachePair checkCache(int end_pos) {
+            for (int i = 0; i < list.size(); i++) {
+                SymbolCachePair pair = list.get(i);
+                if (pair.end_pos == end_pos) {
+                    return pair;
+                }
+            }
+            return null;
+        }
+    }
+
+    private SymbolCache[] interpretResult;
 
     private volatile boolean isWorking;
 
@@ -33,7 +86,6 @@ public class Expression {
         lastLB = new int[s.length() + 1];
         nextFS = new int[s.length() + 1];
         commaCnt = new int[s.length() + 1];
-        funcSer = new int[s.length() + 1];
         brDiff = 0;
 
         int[] symbolStack = new int[s.length() + 1]; // a position stack of all left brackets
@@ -46,7 +98,6 @@ public class Expression {
             lastLB[i] = -1;
             nextFS[i] = -1;
             commaCnt[i] = 0;
-            funcSer[i] = -1;
             char c = s.charAt(i);
             if (i > 0) {
                 br[i] = br[i - 1];
@@ -76,16 +127,14 @@ public class Expression {
                 brDiff--;
             }
         }
+    }
 
-        numberParseRPos = new int[s.length()];
-        numberParseResult = new double[s.length()];
-        isAddSubParseResult = new int[s.length()];
-        isOmitMult = new boolean[s.length()];
-
-        for (int i = 0; i < s.length(); i++) {
-            numberParseRPos[i] = -1;
-            isAddSubParseResult[i] = -1;
-            isOmitMult[i] = false;
+    private void initCache() { // init cache for evaluation
+        funcSer = new int[text.length()];
+        interpretResult = new SymbolCache[text.length()];
+        for (int i = 0; i < interpretResult.length; i++) {
+            interpretResult[i] = new SymbolCache();
+            funcSer[i] = -1;
         }
     }
 
@@ -95,18 +144,15 @@ public class Expression {
 
     // only used when text[p]=='+'/'-' && p>0
     private boolean isAddSubSymbol(int p) {
-        if (isAddSubParseResult[p] > -1)
-            return isAddSubParseResult[p] > 0;
+        if (p == 0) return false;
 
         char cj = text.charAt(p);
         if (!(cj == '+' || cj == '-')) {
-            isAddSubParseResult[p] = 0;
             return false;
         }
 
         cj = text.charAt(p - 1);
         if (isOperator(cj) || cj == 'E') {
-            isAddSubParseResult[p] = 0;
             return false;
         }
         if (ParseNumber.isBaseSymbol(cj)) { // a pos/neg symbol in scientific notation under certain base
@@ -118,22 +164,37 @@ public class Expression {
                 }
             }
             if (pos == text.length()) { // parsed to an end
-                isAddSubParseResult[p] = 0;
                 return false;
             }
             if (pos == p + 1) { // '+/-' directly followed by non-integer symbol
-                isAddSubParseResult[p] = 1;
                 return true;
             }
             if (ParseNumber.isBaseSymbol(cj) || (cj >= 'A' && cj <= 'F') || cj == '.') { // part of another notation
-                isAddSubParseResult[p] = 1;
                 return true;
             }
-            isAddSubParseResult[p] = 0;
             return false;
         }
-        isAddSubParseResult[p] = 1;
         return true;
+    }
+
+    private boolean isOmitMult(int p) {
+        if (p == 0) return false;
+
+        char ci = text.charAt(p);
+        char cj = text.charAt(p - 1);
+
+        boolean iscjPreSymbol = (cj == ')' || cj == '∞' || cj == 'π' || cj == '°' || cj == '!' || cj == '%');
+        boolean iscjNumber = (cj >= '0' && cj <= '9' || cj == '.');
+        boolean iscjBase = ParseNumber.isBaseSymbol(cj);
+        boolean iscjFunc = (cj >= 'a' && cj <= 'z');
+        boolean isciNumber = (ci >= '0' && ci <= '9' || ci == '.');
+        //boolean isciBase=ParseNumber.isBaseSymbol(ci);
+
+        boolean case1 = (ci >= 'a' && ci <= 'z' || ci == '(') && (iscjNumber || iscjPreSymbol || iscjBase);
+        boolean case2 = (isciNumber) && (iscjPreSymbol || iscjFunc);
+        boolean case3 = (ci == '∞' || ci == 'π' || ci == '°' || ci == '%' || ci == '√' || ci == '!') && (iscjNumber || iscjPreSymbol || iscjBase || iscjFunc);
+
+        return case1 || case2 || case3;
     }
 
     // 0+NaN*I is never possible during a calculation
@@ -145,29 +206,98 @@ public class Expression {
             return new Result(1).append("表达式语法错误");
         }
 
+        // Check if result cached
+        SymbolCachePair pair = interpretResult[l].checkCache(r);
+        if (pair != null) { // cached result
+            Result r1, r2;
+            switch (pair.symbol) { // No fatal error now
+                case SymbolCachePair.SYMBOL_CONST:
+                case SymbolCachePair.SYMBOL_NUM:
+                    return new Result(pair.cachedValue);
+                case SymbolCachePair.SYMBOL_ADD:
+                    r1 = value(l, pair.symbol_pos - 1, vX);
+                    r2 = value(pair.symbol_pos + 1, r, vX);
+                    return new Result(Complex.add(r1.val, r2.val));
+                case SymbolCachePair.SYMBOL_SUB:
+                    r1 = value(l, pair.symbol_pos - 1, vX);
+                    r2 = value(pair.symbol_pos + 1, r, vX);
+                    return new Result(Complex.sub(r1.val, r2.val));
+                case SymbolCachePair.SYMBOL_POS:
+                    return value(l + 1, r, vX);
+                case SymbolCachePair.SYMBOL_NEG:
+                    r1 = value(l + 1, r, vX);
+                    return new Result(Complex.inv(r1.val));
+                case SymbolCachePair.SYMBOL_MUL:
+                    r1 = value(l, pair.symbol_pos - 1, vX);
+                    r2 = value(pair.symbol_pos + 1, r, vX);
+                    return new Result(Complex.mul(r1.val, r2.val));
+                case SymbolCachePair.SYMBOL_DIV:
+                    r1 = value(l, pair.symbol_pos - 1, vX);
+                    r2 = value(pair.symbol_pos + 1, r, vX);
+                    return new Result(Complex.div(r1.val, r2.val));
+                case SymbolCachePair.SYMBOL_MUL_OMIT:
+                    r1 = value(l, pair.symbol_pos - 1, vX);
+                    r2 = value(pair.symbol_pos, r, vX); // Attention to the pos!
+                    return new Result(Complex.mul(r1.val, r2.val));
+                case SymbolCachePair.SYMBOL_POW:
+                    r1 = value(l, pair.symbol_pos - 1, vX);
+                    r2 = value(pair.symbol_pos + 1, r, vX);
+                    return new Result(Complex.pow(r1.val, r2.val));
+                case SymbolCachePair.SYMBOL_SQRT:
+                    r1 = value(l + 1, r, vX);
+                    return new Result(Complex.sqrt(r1.val));
+                case SymbolCachePair.SYMBOL_FUNC:
+                    return funcValue(l, r, vX);
+                case SymbolCachePair.SYMBOL_BRACKET:
+                    return value(l + 1, r - 1, vX);
+                case SymbolCachePair.SYMBOL_FACT:
+                    r1 = value(l, pair.symbol_pos - 1, vX);
+                    return fact(r1.val);
+            }
+        }
+
+        // Interpret expression
         String s = text.substring(l, r + 1);
-        // Constants
-        if (s.equals("e")) return new Result(Complex.E); // constant e
-        else if (s.equals("π")) return new Result(Complex.PI); // constant pi
-        else if (s.equals("i")) return new Result(Complex.I); // constant i
-        else if (s.equals("∞")) return new Result(Complex.Inf); // constant Infinity
-        else if (s.equals("reg")) return new Result(memValue); // reg value
-        else if (s.equals("°")) return new Result(new Complex(Math.PI / 180)); // degree value
-        else if (s.equals("%")) return new Result(new Complex(0.01)); // percent value
-        else if (s.equals("x")) {
-            if (vX.isValid() || vX.isNaN())
-                return new Result(vX); // variable X
+
+        // Variable
+        if (s.equals("x") && (vX.isValid() || vX.isNaN())) return new Result(vX); // variable X
+        if (s.equals("reg")) return new Result(memValue); // reg value
+
+        // omit space and enter
+        if (text.charAt(l) == ' ' || text.charAt(l) == '\n' || text.charAt(l) == '\r')
+            return value(l + 1, r, vX);
+        if (text.charAt(r) == ' ' || text.charAt(r) == '\n' || text.charAt(r) == '\r')
+            return value(l, r - 1, vX);
+
+        /*======================= Below this line, string will be parsed only once ========================*/
+        { // Constants
+            Complex complexConst = null;
+            if (s.equals("e")) complexConst = Complex.E; // constant e
+            else if (s.equals("π")) complexConst = Complex.PI; // constant pi
+            else if (s.equals("i")) complexConst = Complex.I; // constant i
+            else if (s.equals("∞")) complexConst = Complex.Inf; // constant Infinity
+            else if (s.equals("°")) complexConst = new Complex(Math.PI / 180); // degree value
+            else if (s.equals("%")) complexConst = new Complex(0.01); // percent value
+
+            for (String[] str : Constants.constants) {
+                if (s.equals(str[0])) {
+                    complexConst = new Complex(str[1]);
+                    break;
+                }
+            }
+
+            if (complexConst != null) {
+                interpretResult[l].submit(r, SymbolCachePair.SYMBOL_CONST, complexConst);
+                return new Result(complexConst);
+            }
         }
 
-        for (String[] str : Constants.constants) {
-            if (s.equals(str[0])) return new Result(new Complex(str[1]));
-        }
-
-        // try to parse s as a number
-        if (numberParseRPos[l] == r) { // already parsed and cached
-            return new Result(new Complex(numberParseResult[l]));
-        } else try {
-            if (s.indexOf('e') >= 0) {
+        // Number parsing
+        try {
+            // Forbid default real values and char e as a operator
+            // Forbid default notations
+            if (s.indexOf('e') >= 0 || s.indexOf('I') >= 0 || s.indexOf('N') >= 0 ||
+                    s.indexOf('X') >= 0 || s.indexOf('P') >= 0 || s.indexOf('x') >= 0 || s.indexOf('p') >= 0) {
                 throw new NumberFormatException();
             }
 
@@ -177,61 +307,51 @@ public class Expression {
                 }
 
                 double v = Double.parseDouble(s);
-                numberParseRPos[l] = r;
-                numberParseResult[l] = v;
+                interpretResult[l].submit(r, SymbolCachePair.SYMBOL_NUM, new Complex(v));
                 return new Result(new Complex(v));
             } catch (NumberFormatException e) { // try parse double under a base
                 // Not a valid dec Double
                 double v = ParseNumber.parse(s);
-                numberParseRPos[l] = r;
-                numberParseResult[l] = v;
+                interpretResult[l].submit(r, SymbolCachePair.SYMBOL_NUM, new Complex(v));
                 return new Result(new Complex(v));
             }
         } catch (NumberFormatException e) {
             // Not a valid Number
         }
 
-        // omit space and enter
-        if (text.charAt(l) == ' ' || text.charAt(l) == '\n' || text.charAt(l) == '\r') {
-            return value(l + 1, r, vX);
-        }
-        if (text.charAt(r) == ' ' || text.charAt(r) == '\n' || text.charAt(r) == '\r') {
-            return value(l, r - 1, vX);
-        }
-
         char ci;
-
         // Addition and Subtraction
         for (int i = r; i > l; i--) {
             ci = text.charAt(i);
             // Only ONE of the following long boolean expression will be calculated
             if (br[i] == br[l] && isAddSubSymbol(i)) {
-                Result r1, r2;
-                switch (ci) {
-                    case '+':
-                        r1 = value(l, i - 1, vX);
-                        if (r1.isFatalError()) return r1;
-                        r2 = value(i + 1, r, vX);
-                        if (r2.isFatalError()) return r2;
-                        return new Result(Complex.add(r1.val, r2.val));
-                    case '-':
-                        r1 = value(l, i - 1, vX);
-                        if (r1.isFatalError()) return r1;
-                        r2 = value(i + 1, r, vX);
-                        if (r2.isFatalError()) return r2;
-                        return new Result(Complex.sub(r1.val, r2.val));
+                if (ci == '+') {
+                    interpretResult[l].submit(r, SymbolCachePair.SYMBOL_ADD, i);
+                    Result r1 = value(l, i - 1, vX);
+                    if (r1.isFatalError()) return r1;
+                    Result r2 = value(i + 1, r, vX);
+                    if (r2.isFatalError()) return r2;
+                    return new Result(Complex.add(r1.val, r2.val));
+                } else if (ci == '-') {
+                    interpretResult[l].submit(r, SymbolCachePair.SYMBOL_SUB, i);
+                    Result r1 = value(l, i - 1, vX);
+                    if (r1.isFatalError()) return r1;
+                    Result r2 = value(i + 1, r, vX);
+                    if (r2.isFatalError()) return r2;
+                    return new Result(Complex.sub(r1.val, r2.val));
                 }
             }
         }
 
         // Unary operator: positive and negative
-        switch (text.charAt(l)) {
-            case '+':
-                return value(l + 1, r, vX);
-            case '-':
-                Result r1 = value(l + 1, r, vX);
-                if (r1.isFatalError()) return r1;
-                return new Result(Complex.inv(r1.val));
+        if (text.charAt(l) == '+') {
+            interpretResult[l].submit(r, SymbolCachePair.SYMBOL_POS, -1);
+            return value(l + 1, r, vX);
+        } else if (text.charAt(l) == '-') {
+            interpretResult[l].submit(r, SymbolCachePair.SYMBOL_NEG, -1);
+            Result r1 = value(l + 1, r, vX);
+            if (r1.isFatalError()) return r1;
+            return new Result(Complex.inv(r1.val));
         }
 
         // Multiplication and Division
@@ -242,6 +362,7 @@ public class Expression {
                 switch (ci) {
                     case '*':
                     case '×':
+                        interpretResult[l].submit(r, SymbolCachePair.SYMBOL_MUL, i);
                         r1 = value(l, i - 1, vX);
                         if (r1.isFatalError()) return r1;
                         r2 = value(i + 1, r, vX);
@@ -249,12 +370,14 @@ public class Expression {
                         return new Result(Complex.mul(r1.val, r2.val));
                     case '/':
                     case '÷':
+                        interpretResult[l].submit(r, SymbolCachePair.SYMBOL_DIV, i);
                         r1 = value(l, i - 1, vX);
                         if (r1.isFatalError()) return r1;
                         r2 = value(i + 1, r, vX);
                         if (r2.isFatalError()) return r2;
                         return new Result(Complex.div(r1.val, r2.val));
                     case '!':
+                        interpretResult[l].submit(r, SymbolCachePair.SYMBOL_FACT, i);
                         r1 = value(l, i - 1, vX);
                         if (r1.isFatalError()) return r1;
                         if (i != r)
@@ -263,14 +386,8 @@ public class Expression {
                             return new Result(1).append("阶乘只能作用于自然数");
                         return fact(r1.val);
                     default:
-                        if (isOmitMult[i]) { // cached;
-                            r1 = value(l, i - 1, vX);
-                            if (r1.isFatalError()) return r1;
-                            r2 = value(i, r, vX);
-                            if (r2.isFatalError()) return r2;
-                            return new Result(Complex.mul(r1.val, r2.val));
-                        } else if (isOmitMult(i)) {
-                            isOmitMult[i] = true;
+                        if (isOmitMult(i)) { // * symbol omission
+                            interpretResult[l].submit(r, SymbolCachePair.SYMBOL_MUL_OMIT, i);
                             r1 = value(l, i - 1, vX);
                             if (r1.isFatalError()) return r1;
                             r2 = value(i, r, vX);
@@ -281,18 +398,20 @@ public class Expression {
             }
         }
 
-        for (int i = l; i <= r; i++) {
+        // Power (priority right->left)
+        for (int i = l; i <= r; i++)
             if (br[i] == br[l] && text.charAt(i) == '^') {
+                interpretResult[l].submit(r, SymbolCachePair.SYMBOL_POW, i);
                 Result r1 = value(l, i - 1, vX);
                 if (r1.isFatalError()) return r1;
                 Result r2 = value(i + 1, r, vX);
                 if (r2.isFatalError()) return r2;
                 return new Result(Complex.pow(r1.val, r2.val));
             }
-        }
 
         // Sqrt symbol
         if (text.charAt(l) == '√') {
+            interpretResult[l].submit(r, SymbolCachePair.SYMBOL_SQRT, -1);
             Result r1 = value(l + 1, r, vX);
             if (r1.isFatalError()) return r1;
             return new Result(Complex.sqrt(r1.val));
@@ -301,8 +420,13 @@ public class Expression {
         // Brackets
         if (text.charAt(r) != ')')
             return new Result(1).append("无法计算 “" + s + "”");
-        if (text.charAt(l) == '(')
+        if (text.charAt(l) == '(') {
+            interpretResult[l].submit(r, SymbolCachePair.SYMBOL_BRACKET, -1);
             return value(l + 1, r - 1, vX);
+        }
+
+        // parse function
+        interpretResult[l].submit(r, SymbolCachePair.SYMBOL_FUNC, -1);
         return funcValue(l, r, vX);
     }
 
@@ -316,11 +440,10 @@ public class Expression {
         int leftBr; // where's the left bracket
         int exprParamNum; // how many params requires functional input
 
-        if (funcSer[l] < 0)
-
-        { // not searched in list yet
+        if (funcSer[l] < 0) { // not searched in list yet
             for (int i = 0; i < Function.funcList.length; i++) {
                 if (s.startsWith(Function.funcList[i].funcName + "(")) {
+                    //Log.i("expression","parse "+s);
                     funcSer[l] = i; // found
                     break;
                 }
@@ -574,36 +697,17 @@ public class Expression {
         return new Result(1).append("函数 “" + Function.funcList[listPos].funcName + "” 参数错误");
     }
 
-    private boolean isOmitMult(int p) {
-        if (p == 0) return false;
-
-        char ci = text.charAt(p);
-        char cj = text.charAt(p - 1);
-
-        boolean iscjPreSymbol = (cj == ')' || cj == '∞' || cj == 'π' || cj == '°' || cj == '!' || cj == '%');
-        boolean iscjNumber = (cj >= '0' && cj <= '9' || cj == '.');
-        boolean iscjBase = ParseNumber.isBaseSymbol(cj);
-        boolean iscjFunc = (cj >= 'a' && cj <= 'z');
-        boolean isciNumber = (ci >= '0' && ci <= '9' || ci == '.');
-        //boolean isciBase=ParseNumber.isBaseSymbol(ci);
-
-        boolean case1 = (ci >= 'a' && ci <= 'z' || ci == '(') && (iscjNumber || iscjPreSymbol || iscjBase);
-        boolean case2 = (isciNumber) && (iscjPreSymbol || iscjFunc);
-        boolean case3 = (ci == '∞' || ci == 'π' || ci == '°' || ci == '%' || ci == '√' || ci == '!') && (iscjNumber || iscjPreSymbol || iscjBase || iscjFunc);
-
-        return case1 || case2 || case3;
-    }
-
     public Result value() { // Entrance !
-        // 0+NaNi id a sign for "No Variable X provided" initially
         isWorking = true;
-
         isIntegOverTolerance = false;
         isDiffOverTolerance = false;
-
         if (brDiff != 0) {
             return new Result(1).append("括号不匹配");
         }
+
+        // Start working
+        // 0+NaNi id a sign for "No Variable X provided" initially
+        initCache();
         Result res = value(0, text.length() - 1, new Complex(0, Double.NaN));
         return res;
     }
@@ -950,7 +1054,6 @@ public class Expression {
             return new Result(1).append("无法运算 sum 的路径");
         }
         for (v.re = ds; v.re <= de; v.re += 1, cnt++) {
-
             if (!isWorking) return new Result(2);
 
             v.im = (v.re - ds) * ratio + start.im;
@@ -958,7 +1061,6 @@ public class Expression {
             if (res.isFatalError()) {
                 return res;
             }
-
             if (!res.val.isFinite()) {
                 return new Result(sum).append("求和时发现错误 x=" + v.toString() + " ，sum可能不是有限的");
             }
@@ -1010,18 +1112,18 @@ public class Expression {
             if (!ans.isFinite()) { // invalid value occurred, no need to continue
                 break;
             }
-            if (!isWorking) return new Complex(Double.NaN);
+            if (!isWorking) return new Complex().error(2);
         }
 
         return ans;
     }
 
     public Complex perm(Complex n, Complex r) {
-
         return permIter(n, Complex.sub(n, r));
     }
 
     private Complex combIter(Complex n_, Complex m_) { // Gamma(n+1)/Gamma(m+1)/Gamma(n-m+1)
+
         Complex n, m;
         Complex ans = new Complex(1);
         n = n_;
@@ -1040,7 +1142,7 @@ public class Expression {
             if (!ans.isFinite()) { // invalid value occurred, no need to continue
                 break;
             }
-            if (!isWorking) return new Complex(Double.NaN);
+            if (!isWorking) return new Complex().error(2);
         }
 
         return ans;
