@@ -23,6 +23,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.EditText;
+import android.widget.FrameLayout;
 import android.widget.GridView;
 import android.widget.TextView;
 
@@ -59,10 +60,9 @@ public class MainActivity extends BaseActivity {
     private ArrayList<View> drawerPageList;
 
     private boolean realTime;
-    private HelpUtil helpUtil;
     private Pattern keywords;
-    final private String[] OPERATOR = {"DEL", "÷", "×", "-", "+", "%", ",", "i"};
-    final private String[] OPERATOR_VICE = {"CLR", "√", "^", "!", "()", "°", "∞", "x"};
+    final private String[] OPERATOR = {"÷", "×", "-", "+", "%", ",", "i"};
+    final private String[] OPERATOR_VICE = {"√", "^", "!", "()", "°", "∞", "x"};
 
     final private String[][] FUNCTION = {
             {"sqrt", "cbrt", "root", "rand", "randInt", "lg", "ln", "log",
@@ -78,7 +78,7 @@ public class MainActivity extends BaseActivity {
             {"平方根", "立方根", "开方", "随机复数", "随机整数", "常用对数", "自然对数", "对数",
                     "绝对值", "最小", "最大", "阶乘", "正弦", "余弦", "正切", "反正弦", "反余弦",
                     "反正切", "双曲正弦", "双曲余弦", "双曲正切", "反双曲正弦", "反双曲余弦",
-                    "反双曲正切", "倒数", "累加求和", "实部", "虚部", "辐角", "模长", "寄存",
+                    "反双曲正切", "倒数", "累加求和", "实部", "虚部", "辐角", "范数", "寄存",
                     "共轭复数", "导函数", "极限", "求值", "函数零点", "定积分", "e底指数",
                     "最大公约", "最小公倍", "排列", "组合", "四舍五入", "向下取整", "向上取整",
                     "取正负号", "伽玛函数", "取余", "分数化简", "质数", "判断质数", "判断奇数",
@@ -109,17 +109,39 @@ public class MainActivity extends BaseActivity {
         initNumeric();
         initOperator();
         initOperatorPro();
-        initCR();
-        realTime = preferences.getBoolean("real", true);
-        findViewById(R.id.drawer_right).setOnClickListener(new View.OnClickListener() {
+        initConf();
+        initDelete();
+    }
+
+    private void initDelete() {
+        FrameLayout delete = (FrameLayout) findViewById(R.id.delete);
+        ((TextView) delete.findViewById(R.id.text_delete)).setText("DEL");
+        ((TextView) delete.findViewById(R.id.vice_delete)).setText("CLR");
+        delete.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                drawer.openDrawer(GravityCompat.END);
+                Editable editable = inText.getText();
+                int index = inText.getSelectionStart();
+                int index2 = inText.getSelectionEnd();
+                if (index == index2) {
+                    if (index == 0) return;
+                    editable.delete(index - 1, index);
+                } else {
+                    editable.delete(index, index2);
+                }
+            }
+        });
+        delete.setOnLongClickListener(new View.OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View v) {
+                ExpressionHandler.stop();
+                inText.setText(null);
+                return true;
             }
         });
     }
 
-    private void initCR() {
+    private void initConf() {
         int[] y = {1, 3, 1, 3, 3};
         for (int i = 0; i < y.length; i++)
             barView.get(i).setNumColumns(preferences.getInt("CRy" + ("" + i), y[i]));
@@ -127,6 +149,14 @@ public class MainActivity extends BaseActivity {
         int[] z = {6, 4, 5, 5, 5};
         for (int i = 0; i < z.length; i++)
             barAdapter.get(i).setValue(preferences.getInt("CRz" + ("" + i), z[i]));
+
+        realTime = preferences.getBoolean("real", true);
+        findViewById(R.id.drawer_right).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                drawer.openDrawer(GravityCompat.END);
+            }
+        });
     }
 
     private void initKeyWords() {
@@ -197,7 +227,7 @@ public class MainActivity extends BaseActivity {
                 drawer.closeDrawer(GravityCompat.START);
             }
         });
-        GridViewAdapter sideBarAdapter = new GridViewAdapter(this, sideBar, Arrays.asList(FUNCTION_LIST), R.layout.button_sidebar);
+        GridViewAdapter sideBarAdapter = new GridViewAdapter(this, sideBar, Arrays.asList(FUNCTION_LIST), null, R.layout.button_sidebar);
         barAdapter.add(sideBarAdapter);
         sideBar.setAdapter(sideBarAdapter);
     }
@@ -285,20 +315,17 @@ public class MainActivity extends BaseActivity {
                 operatorProBar.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
                     @Override
                     public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
-                        if (helpUtil == null)
-                            helpUtil = new HelpUtil();
                         String text = ((TextView) view.findViewById(R.id.text_item)).getText().toString();
                         AlertDialog.Builder dialog = new AlertDialog.Builder(MainActivity.this);
                         dialog.setTitle(text);
-                        dialog.setMessage(helpUtil.getFunctionHelp(text));
+                        dialog.setMessage(HelpUtil.getFunctionHelp(text));
                         dialog.setPositiveButton("确定", null);
                         dialog.show();
                         return true;
                     }
                 });
             int id = i == 0 ? R.layout.button_function : R.layout.button_constant;
-            GridViewAdapter operatorProAdapter = new GridViewAdapter(this, operatorProBar, Arrays.asList(FUNCTION[i++]), id);
-            operatorProAdapter.setViceText(Arrays.asList(FUNCTION_VICE[i - 1]));
+            GridViewAdapter operatorProAdapter = new GridViewAdapter(this, operatorProBar, Arrays.asList(FUNCTION[i++]), Arrays.asList(FUNCTION_VICE[i - 1]), id);
 
             barAdapter.add(operatorProAdapter);
             operatorProBar.setAdapter(operatorProAdapter);
@@ -314,16 +341,6 @@ public class MainActivity extends BaseActivity {
                 String str = ((TextView) view.findViewById(R.id.text_item)).getText().toString();
                 Editable editable = inText.getText();
                 int index = inText.getSelectionStart();
-                if (str.equals("DEL")) {
-                    int index2 = inText.getSelectionEnd();
-                    if (index == index2) {
-                        if (index == 0) return;
-                        editable.delete(index - 1, index);
-                    } else {
-                        editable.delete(index, index2);
-                    }
-                    return;
-                }
                 editable.insert(index, str);
             }
         });
@@ -331,21 +348,13 @@ public class MainActivity extends BaseActivity {
             @Override
             public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
                 String str = ((TextView) view.findViewById(R.id.text_vice_item)).getText().toString();
-                if (str.equals("CLR")) {
-                    ExpressionHandler.stop();
-                    inText.setText(null);
-                    return true;
-                }
                 int index = inText.getSelectionStart();
                 inText.getText().insert(index, str);
-                if (str.equals("()"))
-                    inText.setSelection(index + str.length() - 1);
                 return true;
             }
         });
-        GridViewAdapter operatorAdapter = new GridViewAdapter(this, operatorBar, Arrays.asList(OPERATOR), R.layout.button_operator);
+        GridViewAdapter operatorAdapter = new GridViewAdapter(this, operatorBar, Arrays.asList(OPERATOR), Arrays.asList(OPERATOR_VICE), R.layout.button_operator);
         barAdapter.add(operatorAdapter);
-        operatorAdapter.setViceText(Arrays.asList(OPERATOR_VICE));
         operatorBar.setAdapter(operatorAdapter);
     }
 
@@ -378,7 +387,7 @@ public class MainActivity extends BaseActivity {
                 inText.getText().insert(index, str);
             }
         });
-        GridViewAdapter numericAdapter = new GridViewAdapter(this, numericBar, Arrays.asList(NUMERIC), R.layout.button_numeric);
+        GridViewAdapter numericAdapter = new GridViewAdapter(this, numericBar, Arrays.asList(NUMERIC), null, R.layout.button_numeric);
         barAdapter.add(numericAdapter);
         numericBar.setAdapter(numericAdapter);
     }
@@ -442,6 +451,7 @@ public class MainActivity extends BaseActivity {
                 }
             });
         }
+
     }
 
     private boolean modified = true;

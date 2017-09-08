@@ -166,7 +166,7 @@ public class Complex {
     }
 
     public String toString() {
-        if (!TextUtils.isEmpty(answer) || answer.getBytes().length > 100)
+        if (!TextUtils.isEmpty(answer))
             return answer;
         double threshold = (Result.precision < Result.maxPrecision ? Math.pow(Result.base, -Result.precision) : 0);
         if (Double.isNaN(im) && Double.isInfinite(re)) {

@@ -270,6 +270,7 @@ public class Expression {
             return value(l, r - 1, vX);
 
         /*======================= Below this line, string will be parsed only once ========================*/
+
         { // Constants
             Complex complexConst = null;
             if (s.equals("e")) complexConst = Complex.E; // constant e
@@ -875,7 +876,7 @@ public class Expression {
             if (rp.val.isValid() && !rp.val.isNaN()) {
                 return rp;
             }
-            if (rp.err == -1) { // Initial Value Error
+            if (rp.getError() == -1) { // Initial Value Error
                 break;
             }
             if (M == 1.0) {

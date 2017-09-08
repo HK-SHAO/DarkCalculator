@@ -3,7 +3,7 @@ package com.sf.ExpressionHandler;
 // Containing a complex result
 public class Result {
     public Complex val = new Complex(0);
-    public int err;
+    private int err;
     public static int precision = 10;
     public static int base = 10;
     public static int maxPrecision = 15;
@@ -35,10 +35,10 @@ public class Result {
     }
 
     public boolean isFatalError() {
-        return err > 0;
+        return this.err > 0;
     }
 
     public int getError() {
-        return err;
+        return this.err;
     }
 }

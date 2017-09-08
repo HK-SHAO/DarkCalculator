@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">DarkCalculator</string>
+    <string name="app_name">险恶计算器</string>
     <string name="app_about">这是烧风用Android Studio开发的第二个作品，马上要开学了，很多坑却还没填完，只好硬着头皮提前上架了，大家见谅。\n
 \n
 这是一款兼容性高，功能强大，拥有近60个函数，支持复数运算和解方程并且开源的科学计算器，另外还添加了进制转换，大数运算，大写数字等功能。虽然还没有完善，但我会在上学的过程中利用业余时间继续完善它的。\n
@@ -32,7 +32,7 @@ Calci-kernel开源地址：https://github.com/Iraka-C/Calci-kernel</string>
 界面中所有的的按钮区均可向上滑动以显示更多的按钮\n
 \n
 如何表示其它进制的数：\n
-使用⑵⑶⑷等符号放置到数的末尾来标识数的进制即可运算，标识一个16进制的数的例子：FFABC⒃\n
+使用“⑵⑶⑷”等符号放置到数的末尾来标识数的进制即可运算，标识一个16进制的数的例子：FFABC⒃\n
 \n
 函数的使用方法：\n
 函数的使用方法可以长按对应的函数按钮查看</string>

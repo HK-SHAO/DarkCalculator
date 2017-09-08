@@ -12,12 +12,47 @@
         android:layout_weight="3.6"
         android:background="#424242" />
 
-    <GridView
-        android:id="@+id/bar_operator"
+    <LinearLayout
         android:layout_width="0px"
         android:layout_height="match_parent"
         android:layout_weight="1.0"
-        android:background="#757575" />
+        android:orientation="vertical">
+
+        <FrameLayout
+            android:id="@+id/delete"
+            android:layout_width="match_parent"
+            android:layout_height="78dp"
+            android:background="#757575"
+            android:foreground="?android:attr/selectableItemBackground">
+
+            <TextView
+                android:id="@+id/text_delete"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:fontFamily="sans-serif-light"
+                android:textColor="@color/colorWhite"
+                android:textSize="20sp" />
+
+            <TextView
+                android:id="@+id/vice_delete"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="right"
+                android:paddingRight="12dp"
+                android:paddingTop="6dp"
+                android:textColor="@color/colorWhite"
+                android:textSize="12sp" />
+
+        </FrameLayout>
+
+        <GridView
+            android:id="@+id/bar_operator"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="#757575" />
+
+    </LinearLayout>
 
 
     <ImageView

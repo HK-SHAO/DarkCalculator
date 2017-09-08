@@ -1,6 +1,7 @@
 package com.sf.DarkCalculator;
 
 
+import android.app.Activity;
 import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -13,16 +14,18 @@ import java.util.List;
 
 public class GridViewAdapter extends BaseAdapter {
 
-    private Context context;
+    private Activity context;
     private List<String> text;
     private List<String> viceText;
     private GridView gridView;
     private int layoutId;
     private int value = 4;
+    private static int height;
 
-    public GridViewAdapter(Context context, GridView gridView, List<String> text, int layoutId) {
+    public GridViewAdapter(Activity context, GridView gridView, List<String> text, List<String> viceText, int layoutId) {
         this.context = context;
         this.text = text;
+        this.viceText = viceText;
         this.gridView = gridView;
         this.layoutId = layoutId;
     }
@@ -34,7 +37,6 @@ public class GridViewAdapter extends BaseAdapter {
 
     @Override
     public Object getItem(int position) {
-
         return text.get(position);
     }
 
@@ -65,27 +67,21 @@ public class GridViewAdapter extends BaseAdapter {
         }
 
         String text = this.text.get(position);
-        if (text.equals("DEL"))
-            viewHolder.title.setTextSize(20);
         viewHolder.title.setText(text);
 
         if (viceText != null) {
             String text2 = viceText.get(position);
-            if (text2.equals("CLR"))
-                viewHolder.vice.setTextSize(10);
             viewHolder.vice.setText(text2);
         }
 
+        if (height == 0)
+            height = gridView.getHeight();
         GridView.LayoutParams param = new GridView.LayoutParams(
                 ViewGroup.LayoutParams.MATCH_PARENT,
-                gridView.getHeight() / value);
+                height / value);
         view.setLayoutParams(param);
 
         return view;
-    }
-
-    public void setViceText(List<String> list) {
-        this.viceText = list;
     }
 
     public void setValue(int value) {
