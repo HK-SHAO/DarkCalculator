@@ -21,6 +21,7 @@ import android.text.style.ForegroundColorSpan;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
 import android.widget.EditText;
 import android.widget.FrameLayout;
@@ -58,6 +59,8 @@ public class MainActivity extends BaseActivity {
     private ViewPager drawerPager;
     private DrawerLayout drawer;
     private ArrayList<View> drawerPageList;
+    private MenuItem godMode;
+    public FrameLayout delete;
 
     private boolean realTime;
     private Pattern keywords;
@@ -68,9 +71,9 @@ public class MainActivity extends BaseActivity {
             {"sqrt", "cbrt", "root", "rand", "randInt", "lg", "ln", "log",
                     "abs", "min", "max", "fact", "sin", "cos", "tan", "asin", "acos",
                     "atan", "sinh", "cosh", "tanh", "asinh", "acosh", "atanh", "recipr",
-                    "sum", "re", "im", "arg", "norm", "reg", "conj", "diff", "lim",
-                    "eval", "fzero", "integ", "exp", "gcd", "lcm", "perm", "comb", "round",
-                    "floor", "ceil", "sign", "gamma", "remn", "reduc", "prime", "isPrime", "isOdd",
+                    "re", "im", "arg", "norm", "reg", "conj", "diff", "sum", "lim", "eval",
+                    "fzero", "integ", "exp", "gcd", "lcm", "perm", "comb", "round", "floor",
+                    "ceil", "sign", "gamma", "remn", "reduc", "prime", "isPrime", "isOdd",
                     "toDEG", "toRAD", "reStart", "setPrec", "setBase", "setCR", "setTS", "cust"},
             {"ans", "reg", "π", "e", "F", "h", "ћ", "γ", "φ", "c", "N", "R", "k", "G", "Φ", "me", "mn", "mp", "true", "false"}};
 
@@ -78,8 +81,8 @@ public class MainActivity extends BaseActivity {
             {"平方根", "立方根", "开方", "随机复数", "随机整数", "常用对数", "自然对数", "对数",
                     "绝对值", "最小", "最大", "阶乘", "正弦", "余弦", "正切", "反正弦", "反余弦",
                     "反正切", "双曲正弦", "双曲余弦", "双曲正切", "反双曲正弦", "反双曲余弦",
-                    "反双曲正切", "倒数", "累加求和", "实部", "虚部", "辐角", "范数", "寄存",
-                    "共轭复数", "导函数", "极限", "求值", "函数零点", "定积分", "e底指数",
+                    "反双曲正切", "倒数", "实部", "虚部", "辐角", "范数", "寄存", "共轭复数",
+                    "导函数", "累加求和", "极限", "求值", "函数零点", "定积分", "e底指数",
                     "最大公约", "最小公倍", "排列", "组合", "四舍五入", "向下取整", "向上取整",
                     "取正负号", "伽玛函数", "取余", "分数化简", "质数", "判断质数", "判断奇数",
                     "转角度", "转弧度", "重启APP", "输出精度", "输出进制", "排列方式", "字体大小", "自定义"}, {
@@ -105,16 +108,16 @@ public class MainActivity extends BaseActivity {
         initDrawer();
         initPages();
         initTabs();
+        initDelete();
         initSideBar();
         initNumeric();
         initOperator();
         initOperatorPro();
         initConf();
-        initDelete();
     }
 
     private void initDelete() {
-        FrameLayout delete = (FrameLayout) findViewById(R.id.delete);
+        delete = (FrameLayout) findViewById(R.id.delete);
         ((TextView) delete.findViewById(R.id.text_delete)).setText("DEL");
         ((TextView) delete.findViewById(R.id.vice_delete)).setText("CLR");
         delete.setOnClickListener(new View.OnClickListener() {
@@ -227,7 +230,8 @@ public class MainActivity extends BaseActivity {
                 drawer.closeDrawer(GravityCompat.START);
             }
         });
-        GridViewAdapter sideBarAdapter = new GridViewAdapter(this, sideBar, Arrays.asList(FUNCTION_LIST), null, R.layout.button_sidebar);
+        GridViewAdapter sideBarAdapter = new GridViewAdapter(this, sideBar, Arrays.asList(FUNCTION_LIST),
+                null, R.layout.button_sidebar);
         barAdapter.add(sideBarAdapter);
         sideBar.setAdapter(sideBarAdapter);
     }
@@ -281,9 +285,9 @@ public class MainActivity extends BaseActivity {
 
     public void setBarCR(final int x, final int y, final int z) {
         SharedPreferences.Editor editor = preferences.edit();
-        editor.putInt("CRy" + ("" + x), y);
-        editor.putInt("CRz" + ("" + x), z);
-        editor.apply();
+        editor.putInt("CRy" + ("" + x), y)
+                .putInt("CRz" + ("" + x), z)
+                .apply();
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
@@ -325,7 +329,8 @@ public class MainActivity extends BaseActivity {
                     }
                 });
             int id = i == 0 ? R.layout.button_function : R.layout.button_constant;
-            GridViewAdapter operatorProAdapter = new GridViewAdapter(this, operatorProBar, Arrays.asList(FUNCTION[i++]), Arrays.asList(FUNCTION_VICE[i - 1]), id);
+            GridViewAdapter operatorProAdapter = new GridViewAdapter(this, operatorProBar,
+                    Arrays.asList(FUNCTION[i++]), Arrays.asList(FUNCTION_VICE[i - 1]), id);
 
             barAdapter.add(operatorProAdapter);
             operatorProBar.setAdapter(operatorProAdapter);
@@ -353,7 +358,8 @@ public class MainActivity extends BaseActivity {
                 return true;
             }
         });
-        GridViewAdapter operatorAdapter = new GridViewAdapter(this, operatorBar, Arrays.asList(OPERATOR), Arrays.asList(OPERATOR_VICE), R.layout.button_operator);
+        GridViewAdapter operatorAdapter = new GridViewAdapter(this, operatorBar, Arrays.asList(OPERATOR),
+                Arrays.asList(OPERATOR_VICE), R.layout.button_operator);
         barAdapter.add(operatorAdapter);
         operatorBar.setAdapter(operatorAdapter);
     }
@@ -377,6 +383,7 @@ public class MainActivity extends BaseActivity {
                                 }).show();
                         return;
                     }
+                    outText.setTextColor(0xffbdbdbd);
                     outText.setText("···");
                     stateText.setText("运算中...");
                     calcThread = new Calc(inText.getText().toString());
@@ -387,7 +394,8 @@ public class MainActivity extends BaseActivity {
                 inText.getText().insert(index, str);
             }
         });
-        GridViewAdapter numericAdapter = new GridViewAdapter(this, numericBar, Arrays.asList(NUMERIC), null, R.layout.button_numeric);
+        GridViewAdapter numericAdapter = new GridViewAdapter(this, numericBar, Arrays.asList(NUMERIC),
+                null, R.layout.button_numeric);
         barAdapter.add(numericAdapter);
         numericBar.setAdapter(numericAdapter);
     }
@@ -438,7 +446,6 @@ public class MainActivity extends BaseActivity {
                         outText.setTextColor(0xffff4081);
                         outText.setText(value[0]);
                     } else {
-                        outText.setTextColor(0xffbdbdbd);
                         Constants.constants.set(0, new String[]{"ans", value[0]});
                         if (value[0].getBytes().length > 1000) {
                             outText.setText("数值太大，请长按此处显示结果");
@@ -461,16 +468,6 @@ public class MainActivity extends BaseActivity {
 
     private void initEditText() {
         inText = (EditText) findViewById(R.id.editText);
-
-        Class<EditText> cls = EditText.class;
-        Method method;
-        try {
-            method = cls.getMethod("setShowSoftInputOnFocus", boolean.class);
-            method.setAccessible(true);
-            method.invoke(inText, false);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
         AutofitHelper.create(inText).setMinTextSize(28);
         inText.requestFocus();
         inText.requestFocusFromTouch();
@@ -530,12 +527,57 @@ public class MainActivity extends BaseActivity {
         setTitle(null);
         toolbar.setSubtitle("科学计算");
         ActionBar actionBar = getSupportActionBar();
-        actionBar.setDisplayHomeAsUpEnabled(true);
         actionBar.setHomeAsUpIndicator(R.drawable.ic_menu);
+    }
+
+    private void setGodMode(boolean isGodMode) {
+        InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+        ActionBar actionBar = getSupportActionBar();
+        if (isGodMode) {
+            actionBar.setDisplayHomeAsUpEnabled(false);
+            drawer.setVisibility(View.GONE);
+            Class<EditText> cls = EditText.class;
+            Method method;
+            try {
+                method = cls.getMethod("setShowSoftInputOnFocus", boolean.class);
+                method.setAccessible(true);
+                method.invoke(inText, true);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+            imm.showSoftInput(inText, InputMethodManager.SHOW_FORCED);
+        } else {
+            actionBar.setDisplayHomeAsUpEnabled(true);
+            drawer.setVisibility(View.VISIBLE);
+            Class<EditText> cls = EditText.class;
+            Method method;
+            try {
+                method = cls.getMethod("setShowSoftInputOnFocus", boolean.class);
+                method.setAccessible(true);
+                method.invoke(inText, false);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+            imm.hideSoftInputFromWindow(inText.getWindowToken(), 0);
+        }
     }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
+        godMode = menu.add("上帝输入").setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
+            @Override
+            public boolean onMenuItemClick(MenuItem item) {
+                boolean isGodMode = !item.isChecked();
+                preferences.edit().putBoolean("godMode", isGodMode).apply();
+                item.setChecked(isGodMode);
+                setGodMode(isGodMode);
+                return true;
+            }
+        });
+        boolean isGodMode = preferences.getBoolean("godMode", false);
+        godMode.setCheckable(true).setChecked(isGodMode);
+        setGodMode(isGodMode);
+
         menu.add("帮助").setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
             @Override
             public boolean onMenuItemClick(MenuItem item) {

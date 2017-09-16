@@ -1,12 +1,11 @@
 package com.sf.DarkCalculator;
 
-
-import android.app.Activity;
 import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
+import android.widget.FrameLayout;
 import android.widget.GridView;
 import android.widget.TextView;
 
@@ -14,15 +13,15 @@ import java.util.List;
 
 public class GridViewAdapter extends BaseAdapter {
 
-    private Activity context;
+    private Context context;
     private List<String> text;
     private List<String> viceText;
     private GridView gridView;
     private int layoutId;
-    private int value = 4;
+    private int value;
     private static int height;
 
-    public GridViewAdapter(Activity context, GridView gridView, List<String> text, List<String> viceText, int layoutId) {
+    public GridViewAdapter(Context context, GridView gridView, List<String> text, List<String> viceText, int layoutId) {
         this.context = context;
         this.text = text;
         this.viceText = viceText;
@@ -76,10 +75,17 @@ public class GridViewAdapter extends BaseAdapter {
 
         if (height == 0)
             height = gridView.getHeight();
+
         GridView.LayoutParams param = new GridView.LayoutParams(
                 ViewGroup.LayoutParams.MATCH_PARENT,
                 height / value);
         view.setLayoutParams(param);
+
+        ViewGroup.LayoutParams param2 = MainActivity.activity.delete.getLayoutParams();
+        if (param2.height != height / value) {
+            param2.height = height / value;
+            MainActivity.activity.delete.setLayoutParams(param2);
+        }
 
         return view;
     }
