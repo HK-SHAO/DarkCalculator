@@ -112,7 +112,7 @@ public class MainActivity extends BaseActivity {
         initSideBar();
         initNumeric();
         initOperator();
-        initOperatorPro();
+        initFunction();
         initConf();
     }
 
@@ -298,7 +298,7 @@ public class MainActivity extends BaseActivity {
     }
 
 
-    private void initOperatorPro() {
+    private void initFunction() {
         int i = 0;
         for (View view : drawerPageList) {
             GridView operatorProBar = (GridView) view;

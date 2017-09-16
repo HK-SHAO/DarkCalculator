@@ -203,7 +203,7 @@ public class Expression {
         if (!isWorking) return new Result(2);
 
         if (l > r) {
-            return new Result(1).append("表达式语法错误");
+            return new Result(1).setAnswer("表达式语法错误");
         }
 
         // Check if result cached
@@ -382,9 +382,9 @@ public class Expression {
                         r1 = value(l, i - 1, vX);
                         if (r1.isFatalError()) return r1;
                         if (i != r)
-                            return new Result(1).append("无法计算 “" + s + "”");
+                            return new Result(1).setAnswer("无法计算 “" + s + "”");
                         if (r1.val.re % 1 != 0 || r1.val.re < 0)
-                            return new Result(1).append("阶乘只能作用于自然数");
+                            return new Result(1).setAnswer("阶乘只能作用于自然数");
                         return fact(r1.val);
                     default:
                         if (isOmitMult(i)) { // * symbol omission
@@ -420,7 +420,7 @@ public class Expression {
 
         // Brackets
         if (text.charAt(r) != ')')
-            return new Result(1).append("无法计算 “" + s + "”");
+            return new Result(1).setAnswer("无法计算 “" + s + "”");
         if (text.charAt(l) == '(') {
             interpretResult[l].submit(r, SymbolCachePair.SYMBOL_BRACKET, -1);
             return value(l + 1, r - 1, vX);
@@ -455,7 +455,7 @@ public class Expression {
 
         // Not found
         if (listPos < 0)
-            return new Result(1).append("没有函数 “" + s.substring(0, s.length() - 2) + "”");
+            return new Result(1).setAnswer("没有函数 “" + s.substring(0, s.length() - 2) + "”");
 
         funcID = Function.funcList[listPos].funcSerial;
         leftBr = l + Function.funcList[listPos].funcName.length();
@@ -468,7 +468,7 @@ public class Expression {
 
         // Too many param.
         if (paramNum > 9)
-            return new Result(1).append("函数 “" + Function.funcList[listPos].funcName + "” 参数错误");
+            return new Result(1).setAnswer("函数 “" + Function.funcList[listPos].funcName + "” 参数错误");
 
         // Calculate each param. value
         Complex[] val = new Complex[10];
@@ -479,7 +479,7 @@ public class Expression {
                     int resr = nextFS[p] - 1;
                     Result res = value(resl, resr, vX);
                     if (res.isFatalError())
-                        return res.append("函数 “" + Function.funcList[listPos].funcName + "” 参数无效");
+                        return res.setAnswer("函数 “" + Function.funcList[listPos].funcName + "” 参数无效");
                     val[i] = res.val;
                 }
             }
@@ -491,19 +491,19 @@ public class Expression {
                 if (val[0].im != 0 || val[1].im != 0)
                     return new Result(3);
                 if (val[0].re % 1 != 0 || val[0].re <= 0)
-                    return new Result(1).append("自定义的ID必须是正整数");
+                    return new Result(1).setAnswer("自定义的ID必须是正整数");
                 switch ((int) val[0].re) {
                     case 1:
                         MainActivity.preferences.edit().putBoolean("real", val[1].re == 1).apply();
-                        return new Result(0).append("设置成功，点击此处重启APP生效");
+                        return new Result(0).setAnswer("设置成功，点击此处重启APP生效");
                     default:
-                        return new Result(1).append("不存在此ID");
+                        return new Result(1).setAnswer("不存在此ID");
                 }
             case Function.ROOT + 2:
                 return new Result(Complex.pow(val[0], Complex.div(new Complex(1), val[1])));
             case Function.REDUC + 2:
                 if (val[0].re % 1 != 0 || val[1].re % 1 != 0)
-                    return new Result(1).append("参数必须是整数");
+                    return new Result(1).setAnswer("参数必须是整数");
                 return reduc(val[0], val[1]);
             case Function.REMN + 2:
                 if (val[0].im != 0 || val[1].im != 0)
@@ -520,7 +520,7 @@ public class Expression {
             case Function.RESTART:
                 MainActivity.activity.finish();
                 MainActivity.actionStart(MainActivity.activity);
-                return new Result(0).append("正在重启中");
+                return new Result(0).setAnswer("正在重启中");
             case Function.SETCR + 3:
                 if (val[0].im != 0 || val[1].im != 0 || val[2].im != 0)
                     return new Result(3);
@@ -528,45 +528,45 @@ public class Expression {
                 double y = val[1].re;
                 double z = val[2].re;
                 if (x % 1 != 0 || y % 1 != 0 || z % 1 != 0 || x < 0 || y <= 0 || z <= 0 || x > 4)
-                    return new Result(1).append("参数格式错误");
+                    return new Result(1).setAnswer("参数格式错误");
                 MainActivity.activity.setBarCR((int) x, (int) y, (int) z);
-                return new Result(0).append("设置成功");
+                return new Result(0).setAnswer("设置成功");
             case Function.SETTS + 1:
                 if (val[0].im != 0)
                     return new Result(3);
                 if (val[0].re <= 0)
-                    return new Result(1).append("字体大小必须是正数");
+                    return new Result(1).setAnswer("字体大小必须是正数");
                 MainActivity.preferences.edit().putFloat("textSize", (float) val[0].re).apply();
-                return new Result(0).append("设置成功，点击此处重启APP生效");
+                return new Result(0).setAnswer("设置成功，点击此处重启APP生效");
             case Function.SIGN + 1:
                 if (val[0].im != 0)
                     return new Result(3);
                 return new Result(new Complex(Math.signum(val[0].re)));
             case Function.ISODD + 1:
                 if (val[0].re % 1 != 0)
-                    return new Result(1).append("参数必须是整数");
+                    return new Result(1).setAnswer("参数必须是整数");
                 return new Result(Complex.isOdd(val[0]));
             case Function.LCM + 2:
                 if (val[0].re % 1 != 0 || val[1].re % 1 != 0 || val[0].re <= 0 || val[1].re <= 0)
-                    return new Result(1).append("参数必须是正整数");
+                    return new Result(1).setAnswer("参数必须是正整数");
                 return lcm(val[0], val[1]);
             case Function.GCD + 2:
                 if (val[0].re % 1 != 0 || val[1].re % 1 != 0 || val[0].re <= 0 || val[1].re <= 0)
-                    return new Result(1).append("参数必须是正整数");
+                    return new Result(1).setAnswer("参数必须是正整数");
                 return gcd(val[0], val[1]);
             case Function.ISPRIME + 1:
                 if (val[0].re % 1 != 0 || val[0].re <= 0)
-                    return new Result(1).append("参数必须是正整数");
+                    return new Result(1).setAnswer("参数必须是正整数");
                 return new Result(isPrime(val[0]));
             case Function.PRIME + 1:
                 if (val[0].re % 1 != 0 || val[0].re <= 0)
-                    return new Result(1).append("寻找质数的参数必须是正整数");
+                    return new Result(1).setAnswer("寻找质数的参数必须是正整数");
                 return prime(val[0]);
             case Function.RECIPR + 1:
                 return new Result(Complex.div(new Complex(1), val[0]));
             case Function.FACT + 1:
                 if (val[0].re % 1 != 0 || val[0].re < 0)
-                    return new Result(1).append("阶乘函数的参数必须是自然数");
+                    return new Result(1).setAnswer("阶乘函数的参数必须是自然数");
                 return fact(val[0]);
             case Function.MAX + 2:
                 return new Result(Complex.max(val[0], val[1]));
@@ -642,9 +642,9 @@ public class Expression {
             case Function.ROUND + 2:
                 double precRnd = Math.round(val[1].re);
                 if (precRnd < 0)
-                    return new Result(1).append("设置的精度过低");
+                    return new Result(1).setAnswer("设置的精度过低");
                 if (precRnd > 15)
-                    return new Result(1).append("设置的精度过高");
+                    return new Result(1).setAnswer("设置的精度过高");
                 double ratio = Math.pow(10, precRnd);
                 return new Result(new Complex(Math.round(val[0].re * ratio) / ratio, Math.round(val[0].im * ratio) / ratio));
             case Function.DIFF + 2:
@@ -671,31 +671,31 @@ public class Expression {
                 return new Result(comb(val[0], val[1]));
             case Function.PREC:
                 Result.setBase(Result.base);
-                return new Result(0).append("精度设置为 " + Result.precision + " 位小数");
+                return new Result(0).setAnswer("精度设置为 " + Result.precision + " 位小数");
             case Function.PREC + 1:
                 if (val[0].im != 0)
                     return new Result(3);
                 int prec = (int) Math.round(val[0].re);
                 if (prec < 0)
-                    return new Result(1).setVal(new Complex(1)).append("精度过低");
+                    return new Result(1).setVal(new Complex(1)).setAnswer("精度过低");
                 if (prec > Result.maxPrecision)
                     return new Result(1).setVal(new Complex(1))
-                            .append("设置的精度过高，最大精度是 " + Result.maxPrecision + " 位小数");
+                            .setAnswer("设置的精度过高，最大精度是 " + Result.maxPrecision + " 位小数");
                 Result.precision = prec;
-                return new Result(0).append("精度设置为 " + prec + " 位小数");
+                return new Result(0).setAnswer("精度设置为 " + prec + " 位小数");
             case Function.BASE:
                 Result.setBase(10);
-                return new Result(0).append("输出进制被设置为" + 10 + " 进制，" + "精度为 " + Result.precision + " 位小数");
+                return new Result(0).setAnswer("输出进制被设置为" + 10 + " 进制，" + "精度为 " + Result.precision + " 位小数");
             case Function.BASE + 1:
                 if (val[0].im != 0)
                     return new Result(3);
                 int base = (int) Math.round(val[0].re);
                 if (!(base >= 2 && base <= 10 || base == 12 || base == 16))
-                    return new Result(1).setVal(new Complex(1)).append("函数的参数无效");
+                    return new Result(1).setVal(new Complex(1)).setAnswer("函数的参数无效");
                 Result.setBase(base);
-                return new Result(0).append("输出进制被设置为 " + base + " 进制，" + "精度为 " + Result.precision + " 位小数");
+                return new Result(0).setAnswer("输出进制被设置为 " + base + " 进制，" + "精度为 " + Result.precision + " 位小数");
         }
-        return new Result(1).append("函数 “" + Function.funcList[listPos].funcName + "” 参数错误");
+        return new Result(1).setAnswer("函数 “" + Function.funcList[listPos].funcName + "” 参数错误");
     }
 
     public Result value() { // Entrance !
@@ -703,7 +703,7 @@ public class Expression {
         isIntegOverTolerance = false;
         isDiffOverTolerance = false;
         if (brDiff != 0) {
-            return new Result(1).append("括号不匹配");
+            return new Result(1).setAnswer("括号不匹配");
         }
 
         // Start working
@@ -763,7 +763,7 @@ public class Expression {
         Result res = new Result(dsum);
         if (!isDiffOverTolerance && dvar > TOL) {
             isDiffOverTolerance = true;
-            res.append("一定情况下函数失效");
+            res.append("某些情况下函数失效");
         }
         return res;
     }
@@ -771,7 +771,7 @@ public class Expression {
     // directional diff
     Result diff(int l, int r, Complex x0, Complex dir) {
         if (dir.re == 0 && dir.im == 0 || !dir.isFinite())
-            return new Result(1).append("无效的方向值");
+            return new Result(1).setAnswer("无效的方向值");
 
         final double TOL = 1E-5;
 
@@ -791,7 +791,7 @@ public class Expression {
         Complex v1 = res1.val;
         Complex r1 = Complex.div(v1, diff(l, r, x1).val);
         if (r1.isNaN()) {
-            return new Result(1).append("无效的初始值");
+            return new Result(1).setAnswer("无效的初始值");
         }
         // 1 step Newton Method Iteration
         Complex x2 = Complex.sub(x1, r1);
@@ -802,7 +802,7 @@ public class Expression {
 
         Complex r2 = Complex.div(v2, diff(l, r, x2, r1).val); // use dir diff to speed up
         if (r2.isNaN()) {
-            return new Result(1).append("无效的初始值");
+            return new Result(1).setAnswer("无效的初始值");
         }
 
         Complex x3;
@@ -840,7 +840,7 @@ public class Expression {
                     // return the result
                     Complex res = histRes.get(minPos);
                     if (minDe > 1E-20 || v2.norm2() > 1E-18) {
-                        root.append("一定情况下函数失效");
+                        root.append("某些情况下函数失效");
                     } else {
                         root = new Result(res);
                     }
@@ -856,7 +856,7 @@ public class Expression {
             r2 = Complex.div(v2, diff(l, r, x3).val); // use dir diff to speed up
             if (r2.isNaN()) { // Math Error
                 if (M.re == 1.0) { // 1.0 is a safely expressed double
-                    root = new Result(1).append("无效的迭代器，一定情况下函数失效");
+                    root = new Result(1).setAnswer("无效的迭代器，某些情况下函数失效");
                 }
                 break;
             }
@@ -884,7 +884,7 @@ public class Expression {
             }
         }
 
-        return new Result(1).append("寻找函数零点 " + text.substring(l, r + 1) + " 失败");
+        return new Result(1).setAnswer("寻找函数零点 " + text.substring(l, r + 1) + " 失败");
     }
 
     // 15 nodes Gauss Quadrature
@@ -990,7 +990,7 @@ public class Expression {
             Result r1 = new Result(sABnew);
             if (!isIntegOverTolerance && abbr.norm().re > 1E3 * TOL) {
                 isIntegOverTolerance = true;
-                r1.append("一定情况下函数失效");
+                r1.append("某些情况下函数失效");
             }
 
             return r1;
@@ -1006,10 +1006,10 @@ public class Expression {
     // general quadrature
     Result integrate(int l, int r, Complex x0, Complex x2) {
         if (x0.isNaN()) {
-            return new Result(1).append("无效的下界");
+            return new Result(1).setAnswer("无效的下界");
         }
         if (x2.isNaN()) {
-            return new Result(1).append("无效的上界");
+            return new Result(1).setAnswer("无效的上界");
         }
         Result check = value(l, r, x0); // Check for syntax error. Better solution ?
         if (check.isFatalError()) return check;
@@ -1040,7 +1040,7 @@ public class Expression {
         boolean isInfiniteSummation = (Double.isInfinite(ds) || Double.isInfinite(de));
 
         if (de < ds) {
-            return new Result(1).append("上界小于下界");
+            return new Result(1).setAnswer("上界小于下界");
         }
 
         Complex sum = new Complex(0);
@@ -1052,7 +1052,7 @@ public class Expression {
 
         double ratio = (end.im - start.im) / (de - ds);
         if (!Complex.isDoubleFinite(ratio)) {
-            return new Result(1).append("无法运算 sum 的路径");
+            return new Result(1).setAnswer("无法运算 sum 的路径");
         }
         for (v.re = ds; v.re <= de; v.re += 1, cnt++) {
             if (!isWorking) return new Result(2);
@@ -1236,7 +1236,7 @@ public class Expression {
             for (h = 1E-1; h >= 1E-10; h *= 0.9, cnt++) {
                 Complex delta = new Complex(Math.cos(i * sectAngle) * h, Math.sin(i * sectAngle) * h);
                 Result resR = limitH(l, r, x0, delta);
-                if (resR.isFatalError()) return new Result(1).append("未找到极限");
+                if (resR.isFatalError()) return new Result(1).setAnswer("未找到极限");
                 Complex res = resR.val;
 
                 if (cnt > 0) {
@@ -1258,7 +1258,7 @@ public class Expression {
             }
 
             if (minDe > 1E-5) { // didn't found ?
-                new Result(1).append("函数可能没有收敛");
+                new Result(-1).setAnswer("函数可能没有收敛");
             } else { // found
                 Complex minRes = histRes.get(minPos - 1);
                 limitSum = Complex.add(limitSum, minRes);
@@ -1267,7 +1267,7 @@ public class Expression {
             }
         }
 
-        if (validSect == 0) return new Result(1).append("未找到极限");
+        if (validSect == 0) return new Result(1).setAnswer("未找到极限");
 
         limitSum.re /= validSect;
         limitSum.im /= validSect;
@@ -1286,7 +1286,7 @@ public class Expression {
     // directional limit
     public Result limit(int l, int r, Complex x0, Complex dir) {
         if (dir.re == 0 && dir.im == 0 || !dir.isFinite())
-            return new Result(1).append("无效的方向值");
+            return new Result(1).setAnswer("无效的方向值");
 
 
         List<Complex> histRes = new ArrayList<>();
@@ -1300,7 +1300,7 @@ public class Expression {
         for (h = 1E-1; h >= 1E-10; h *= 0.9, cnt++) {
             Complex delta = new Complex(dir.re / norm * h, dir.im / norm * h);
             Result resR = limitH(l, r, x0, delta);
-            if (resR.isFatalError()) return new Result(1).append("未找到极限");
+            if (resR.isFatalError()) return new Result(1).setAnswer("未找到极限");
             Complex res = resR.val;
 
             if (cnt > 0) {
@@ -1322,12 +1322,12 @@ public class Expression {
         }
 
         if (minPos < 1) {
-            return new Result(1).append("函数在给定点上可能没有收敛");
+            return new Result(1).setAnswer("函数在给定点上可能没有收敛");
         }
         Complex minRes = histRes.get(minPos - 1);
 
         if (minDe > 1E-5) { // didn't found ?
-            return new Result(1).append("函数在给定点上可能没有收敛");
+            return new Result(1).setAnswer("函数在给定点上可能没有收敛");
         } else { // found
             return new Result(minRes);
         }

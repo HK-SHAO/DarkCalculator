@@ -20,6 +20,7 @@ public class GridViewAdapter extends BaseAdapter {
     private int layoutId;
     private int value;
     private static int height;
+    private ViewGroup.LayoutParams deleteParam;
 
     public GridViewAdapter(Context context, GridView gridView, List<String> text, List<String> viceText, int layoutId) {
         this.context = context;
@@ -81,10 +82,13 @@ public class GridViewAdapter extends BaseAdapter {
                 height / value);
         view.setLayoutParams(param);
 
-        ViewGroup.LayoutParams param2 = MainActivity.activity.delete.getLayoutParams();
-        if (param2.height != height / value) {
-            param2.height = height / value;
-            MainActivity.activity.delete.setLayoutParams(param2);
+        if (layoutId == R.layout.button_operator) {
+            if (deleteParam == null)
+                deleteParam = MainActivity.activity.delete.getLayoutParams();
+            if (deleteParam.height != height / value) {
+                deleteParam.height = height / value;
+                MainActivity.activity.delete.setLayoutParams(deleteParam);
+            }
         }
 
         return view;

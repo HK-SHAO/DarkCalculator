@@ -1,5 +1,7 @@
 package com.sf.ExpressionHandler;
 
+import com.sf.DarkCalculator.MainActivity;
+
 // Containing a complex result
 public class Result {
     public Complex val = new Complex(0);
@@ -18,8 +20,12 @@ public class Result {
         err = err_;
     }
 
-    public Result append(String errorName) {
-        val.setAnswer(errorName);
+    public Result setAnswer(String answer) {
+        val.setAnswer(answer);
+        return this;
+    }
+
+    public Result append(String name) {
         return this;
     }
 
