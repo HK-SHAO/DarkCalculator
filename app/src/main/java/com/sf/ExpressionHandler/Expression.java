@@ -274,16 +274,15 @@ public class Expression {
         { // Constants
             Complex complexConst = null;
             if (s.equals("e")) complexConst = Complex.E; // constant e
-            else if (s.equals("π")) complexConst = Complex.PI; // constant pi
+            else if (s.equals("π") || s.equals("pi")) complexConst = Complex.PI; // constant pi
             else if (s.equals("i")) complexConst = Complex.I; // constant i
             else if (s.equals("∞")) complexConst = Complex.Inf; // constant Infinity
             else if (s.equals("°")) complexConst = new Complex(Math.PI / 180); // degree value
             else if (s.equals("%")) complexConst = new Complex(0.01); // percent value
-
-            for (String[] str : Constants.constants) {
-                if (s.equals(str[0])) {
-                    complexConst = new Complex(str[1]);
-                    break;
+            else {
+                String constValue = Constants.load().get(s);
+                if (constValue != null) {
+                    complexConst = new Complex(constValue);
                 }
             }
 

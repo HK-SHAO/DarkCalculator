@@ -446,7 +446,7 @@ public class MainActivity extends BaseActivity {
                         outText.setTextColor(0xffff4081);
                         outText.setText(value[0]);
                     } else {
-                        Constants.constants.set(0, new String[]{"ans", value[0]});
+                        Constants.setAns(value[0]);
                         if (value[0].getBytes().length > 1000) {
                             outText.setText("数值太大，请长按此处显示结果");
                             ResultsActivity.actionStart(context, value[0]);

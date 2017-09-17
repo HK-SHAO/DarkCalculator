@@ -22,10 +22,12 @@ public class Result {
 
     public Result setAnswer(String answer) {
         val.setAnswer(answer);
+        append(answer);
         return this;
     }
 
     public Result append(String name) {
+        //Temporarily not used
         return this;
     }
 
