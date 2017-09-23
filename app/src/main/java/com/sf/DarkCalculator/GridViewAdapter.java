@@ -5,7 +5,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
-import android.widget.FrameLayout;
 import android.widget.GridView;
 import android.widget.TextView;
 
@@ -19,7 +18,7 @@ public class GridViewAdapter extends BaseAdapter {
     private GridView gridView;
     private int layoutId;
     private int value;
-    private static int height;
+    private int height;
     private ViewGroup.LayoutParams deleteParam;
 
     public GridViewAdapter(Context context, GridView gridView, List<String> text, List<String> viceText, int layoutId) {
@@ -66,12 +65,10 @@ public class GridViewAdapter extends BaseAdapter {
             viewHolder = (ViewHolder) view.getTag();
         }
 
-        String text = this.text.get(position);
-        viewHolder.title.setText(text);
+        viewHolder.title.setText(text.get(position));
 
         if (viceText != null) {
-            String text2 = viceText.get(position);
-            viewHolder.vice.setText(text2);
+            viewHolder.vice.setText(viceText.get(position));
         }
 
         if (height == 0)

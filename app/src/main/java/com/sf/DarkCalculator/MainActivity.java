@@ -29,6 +29,7 @@ import android.widget.GridView;
 import android.widget.TextView;
 
 import com.sf.ExpressionHandler.Constants;
+import com.sf.ExpressionHandler.ExpressionHandler;
 
 import java.lang.reflect.Method;
 import java.util.ArrayList;
@@ -169,7 +170,7 @@ public class MainActivity extends BaseActivity {
             for (String str : array) {
                 sb.append(str + "|");
             }
-        sb.deleteCharAt(sb.length() - 1);
+        sb.append("pi");
         sb.append(")\\b");
         keywords = Pattern.compile(sb.toString());
     }
@@ -484,11 +485,11 @@ public class MainActivity extends BaseActivity {
                     if (calcThread == null)
                         stateText.setText(null);
                     outText.setTextColor(0xffbdbdbd);
-                    outText.setText("···");
+                    outText.setText(null);
                     rootValue = null;
                     return;
                 }
-                if (!realTime) outText.setText("···");
+                if (!realTime) outText.setText(null);
                 if (calcThread == null && realTime) {
                     stateText.setText("运算中...");
                     calcThread = new FastCalc(s.toString());

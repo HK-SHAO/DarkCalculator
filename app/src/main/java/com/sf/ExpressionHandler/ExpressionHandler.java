@@ -1,7 +1,4 @@
-package com.sf.DarkCalculator;
-
-import com.sf.ExpressionHandler.Expression;
-import com.sf.ExpressionHandler.Result;
+package com.sf.ExpressionHandler;
 
 /**
  * Created by user on 2017/8/5.
@@ -27,11 +24,11 @@ public class ExpressionHandler {
                 case 3:
                     return new String[]{"函数不支持复数", "true"};
                 default:
-                    return new String[]{"···", "true"};
+                    throw new Exception();
             }
         } catch (Exception e) {
             e.printStackTrace();
-            return new String[]{"···", "true"};
+            return new String[]{"未知错误", "true"};
         }
     }
 

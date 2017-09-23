@@ -1309,7 +1309,7 @@ public class Expression {
                     overErrorRangeCount = 0;
                     minDe = e;
                     minPos = cnt;
-                } else { // e>=minDe or e is NaN!
+                } else { // e >= minDe or e is NaN!
                     overErrorRangeCount++;
                 }
                 if (overErrorRangeCount > 20) {

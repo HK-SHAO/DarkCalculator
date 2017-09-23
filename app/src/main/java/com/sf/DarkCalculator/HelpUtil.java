@@ -10,9 +10,8 @@ import java.util.Map;
 public class HelpUtil {
 
     private static Map<String, String> map = null;
-    private static HelpUtil help = null;
 
-    public HelpUtil() {
+    private static void initMap() {
         map = new HashMap<>();
         map.put("sqrt", "sqrt函数返回输入参数的平方根，需要1个参数");
         map.put("cbrt", "cbrt函数返回输入参数的立方根，需要1个参数");
@@ -47,7 +46,7 @@ public class HelpUtil {
         map.put("reg", "reg函数返回输入参数自身，用于暂时的存储一个值，需要的时候使用reg即可返回寄存的值，需要1个参数");
         map.put("conj", "conj函数返回输入参数的共轭，需要1个参数");
         map.put("diff", "diff函数返回输入参数导函数的值，至少需要2个参数，第1个参数为携带变量x的函数，第2个参数为x的值，如果你需要设置求导方向，你也可以将其输入为第3个参数");
-        map.put("lim", "lim函数返回给定函数在某一点或无穷处的极限，需要2个参数，第1个参数为携带变量x的函数，第2个参数为变量x趋近的值");
+        map.put("lim", "lim函数返回给定函数在某一点或无穷处的极限，至少需要2个参数，你也可以输入3个参数，第1个参数为携带变量x的函数，第2个参数为变量x趋近的值，第3个为求极限的方向值");
         map.put("eval", "eval函数返回给定函数变量x为某个值时函数的值，需要2个参数，第1个参数为携带变量x的函数，第2个参数为变量x的值");
         map.put("fzero", "fzero函数返回给定函数值为0时变量x的值，至少需要1个参数，第1个参数为携带变量x的函数，如果计算时间太长或者计算失败，你可以尝试估算函数值为0时x的值然后输入为第2个参数作为寻找函数值为0时的初始值，这样可以增加运算速度和成功率");
         map.put("integ", "integ函数返回输入参数的定积分，需要3个参数，第1个参数为携带变量x的函数，第2个参数为积分的下限，第3个参数为积分的上限");
@@ -74,12 +73,13 @@ public class HelpUtil {
         map.put("setCR", "setCR函数用于设置按钮区的排列方式，需要3个参数，第1个参数为对应的按钮区（从0开始为最左边的侧滑栏），第2个参数为每行按钮的个数，第3个参数为每列按钮的个数（注意，输入的参数千万不要太大或者太小，否则你可能需要清除应用数据以恢复按钮的排列方式）");
         map.put("setTS", "setTS函数用于设置全局字体大小的缩放比例，需要1个参数（注意，输入的参数千万不要太大或者太小，否则你可能需要清除应用数据以恢复字体大小）");
         map.put("cust", "cust函数用于自定义此计算器，需要2个参数，第1个参数为自定义的ID，第2个参数为需更改的值\n\n目前可自定义ID有：\n1：用于设置计算器是否进行实时计算，更改的参数可以是true和false");
+
     }
 
     public static String getFunctionHelp(String key) {
-        if (help == null) {
-            help = new HelpUtil();
+        if (map == null) {
+            initMap();
         }
-        return help.map.get(key);
+        return map.get(key);
     }
 }

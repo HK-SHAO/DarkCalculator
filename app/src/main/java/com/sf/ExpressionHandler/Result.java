@@ -1,8 +1,5 @@
 package com.sf.ExpressionHandler;
 
-import com.sf.DarkCalculator.MainActivity;
-
-// Containing a complex result
 public class Result {
     public Complex val = new Complex(0);
     private int err;
