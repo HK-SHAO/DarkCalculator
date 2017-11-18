@@ -23,7 +23,6 @@
         android:fontFamily="sans-serif-light"
         android:gravity="center"
         android:inputType="number"
-        android:textCursorDrawable="@drawable/cursor"
         android:textSize="26sp" />
 
     <LinearLayout

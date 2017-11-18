@@ -1,6 +1,5 @@
 package com.sf.DarkCalculator;
 
-import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -12,17 +11,15 @@ import java.util.List;
 
 public class GridViewAdapter extends BaseAdapter {
 
-    private Context context;
     private List<String> text;
     private List<String> viceText;
     private GridView gridView;
     private int layoutId;
     private int value;
-    private int height;
+    private static int height;
     private ViewGroup.LayoutParams deleteParam;
 
-    public GridViewAdapter(Context context, GridView gridView, List<String> text, List<String> viceText, int layoutId) {
-        this.context = context;
+    public GridViewAdapter(GridView gridView, List<String> text, List<String> viceText, int layoutId) {
         this.text = text;
         this.viceText = viceText;
         this.gridView = gridView;
@@ -54,7 +51,7 @@ public class GridViewAdapter extends BaseAdapter {
         ViewHolder viewHolder;
         View view;
         if (convertView == null) {
-            view = LayoutInflater.from(context).inflate(layoutId, parent, false);
+            view = LayoutInflater.from(MainActivity.activity).inflate(layoutId, parent, false);
             viewHolder = new ViewHolder();
             viewHolder.title = (TextView) view.findViewById(R.id.text_item);
             if (viceText != null)

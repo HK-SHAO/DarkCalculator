@@ -2,13 +2,13 @@ apply plugin: 'com.android.application'
 
 android {
     compileSdkVersion 25
-    buildToolsVersion "26.0.0"
+    buildToolsVersion '26.0.2'
     defaultConfig {
         applicationId "com.sf.DarkCalculator"
         minSdkVersion 11
         targetSdkVersion 25
-        versionCode 13
-        versionName "8"
+        versionCode 14
+        versionName "9"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
         resConfigs "cn"
     }

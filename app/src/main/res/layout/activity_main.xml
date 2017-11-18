@@ -25,6 +25,7 @@
                 android:id="@+id/editText"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
+                android:layout_marginTop="-4dp"
                 android:background="@null"
                 android:fontFamily="sans-serif-light"
                 android:gravity="center_vertical|end"
@@ -32,7 +33,6 @@
                 android:paddingLeft="16dp"
                 android:paddingRight="16dp"
                 android:textColor="#eeeeee"
-                android:textCursorDrawable="@drawable/cursor"
                 android:textSize="66sp" />
 
             <TextView
@@ -40,12 +40,13 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:paddingLeft="16dp"
-                android:textSize="18sp" />
+                android:textSize="16sp" />
 
             <HorizontalScrollView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_gravity="bottom">
+                android:layout_gravity="bottom"
+                android:layout_marginTop="-4dp">
 
                 <TextView
                     android:id="@+id/text_out"

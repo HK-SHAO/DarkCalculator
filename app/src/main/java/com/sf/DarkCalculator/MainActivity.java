@@ -37,18 +37,6 @@ import java.util.Arrays;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-/**
- * █████▒█    ██  ▄████▄   ██ ▄█▀         ██████╗ ██╗   ██╗ ██████╗
- * ▓██   ▒ ██  ▓██▒▒██▀ ▀█   ██▄█▒        ██╔══██╗██║   ██║██╔════╝
- * ▒████ ░▓██  ▒██░▒▓█    ▄ ▓███▄░        ██████╔╝██║   ██║██║  ███╗
- * ░▓█▒  ░▓▓█  ░██░▒▓▓▄ ▄██▒▓██ █▄        ██╔══██╗██║   ██║██║   ██║
- * ░▒█░   ▒▒█████▓ ▒ ▓███▀ ░▒██▒ █▄       ██████╔╝╚██████╔╝╚██████╔╝
- * ▒ ░   ░▒▓▒ ▒ ▒ ░ ░▒ ▒  ░▒ ▒▒ ▓▒        ╚═════╝  ╚═════╝  ╚═════╝
- * ░     ░░▒░ ░ ░   ░  ▒   ░ ░▒ ▒░
- * ░ ░    ░░░ ░ ░ ░        ░ ░░ ░
- * ░     ░ ░      ░  ░
- */
-
 public class MainActivity extends BaseActivity {
 
     public static MainActivity activity;
@@ -60,15 +48,17 @@ public class MainActivity extends BaseActivity {
     private ViewPager drawerPager;
     private DrawerLayout drawer;
     private ArrayList<View> drawerPageList;
-    private MenuItem godMode;
     public FrameLayout delete;
 
     private boolean realTime;
-    private Pattern keywords;
-    final private String[] OPERATOR = {"÷", "×", "-", "+", "%", ",", "i"};
-    final private String[] OPERATOR_VICE = {"√", "^", "!", "()", "°", "∞", "x"};
 
-    final private String[][] FUNCTION = {
+    private static final int[] YY = {1, 3, 1, 3, 3};
+    private static final int[] ZZ = {6, 4, 5, 5, 5};
+
+    private static final String[] OPERATOR = {"÷", "×", "-", "+", "%", ",", "i"};
+    private static final String[] OPERATOR_VICE = {"√", "^", "!", "()", "°", "∞", "x"};
+
+    private static final String[][] BUTTON = {
             {"sqrt", "cbrt", "root", "rand", "randInt", "lg", "ln", "log",
                     "abs", "min", "max", "fact", "sin", "cos", "tan", "asin", "acos",
                     "atan", "sinh", "cosh", "tanh", "asinh", "acosh", "atanh", "recipr",
@@ -78,7 +68,7 @@ public class MainActivity extends BaseActivity {
                     "toDEG", "toRAD", "reStart", "setPrec", "setBase", "setCR", "setTS", "cust"},
             {"ans", "reg", "π", "e", "F", "h", "ћ", "γ", "φ", "c", "N", "R", "k", "G", "Φ", "me", "mn", "mp", "true", "false"}};
 
-    final private String[][] FUNCTION_VICE = {
+    private static final String[][] BUTTON_VICE = {
             {"平方根", "立方根", "开方", "随机复数", "随机整数", "常用对数", "自然对数", "对数",
                     "绝对值", "最小", "最大", "阶乘", "正弦", "余弦", "正切", "反正弦", "反余弦",
                     "反正切", "双曲正弦", "双曲余弦", "双曲正切", "反双曲正弦", "反双曲余弦",
@@ -90,10 +80,22 @@ public class MainActivity extends BaseActivity {
             "上次运算", "寄存器", "圆周率", "自然底数", "法拉第", "普朗克", "约化普朗克", "欧拉", "黄金分割",
             "光速", "阿伏伽德罗", "理想气体", "玻尔兹曼", "万有引力", "磁通量子", "电子质量", "质子质量", "中子质量", "真", "假"}};
 
-    final private String[] FUNCTION_LIST = {"科学计算", "大数计算", "时间计算", "进制转换",
+    private static final Pattern FUNCTIONS_KEYWORDS = Pattern.compile(
+            "\\b(" + "sqrt|cbrt|root|rand|randInt|lg|ln|log" +
+                    "abs|min|max|fact|sin|cos|tan|asin|acos" +
+                    "atan|sinh|cosh|tanh|asinh|acosh|atanh|recipr" +
+                    "re|im|arg|norm|reg|conj|diff|sum|lim|eval" +
+                    "fzero|integ|exp|gcd|lcm|perm|comb|round|floor" +
+                    "ceil|sign|gamma|remn|reduc|prime|isPrime|isOdd" +
+                    "toDEG|toRAD|reStart|setPrec|setBase|setCR|setTS|cust" + ")\\b");
+
+    private static final Pattern CONSTANS_KEYWORDS = Pattern.compile(
+            "\\b(" + "ans|reg|π|e|F|h|ћ|γ|φ|c|N|R|k|G|Φ|me|mn|mp|true|false" + ")\\b");
+
+    private static final String[] FUNCTION_LIST = {"科学计算", "大数计算", "时间计算", "进制转换",
             "方程式配平", "分子量计算", "亲戚关系计算", "大写数字", "汇率转换", "单位转换"};
 
-    final private String[] NUMERIC = {"7", "8", "9", "4", "5", "6", "1", "2", "3", "·", "0", "=", "A", "B", "C", "D", "E", "F",
+    private static final String[] NUMERIC = {"7", "8", "9", "4", "5", "6", "1", "2", "3", "·", "0", "=", "A", "B", "C", "D", "E", "F",
             "⑵", "⑶", "⑷", "⑸", "⑹", "⑺", "⑻", "⑼", "⑽", "⑾", "⑿", "⒀", "⒁", "⒂", "⒃"};
 
     @Override
@@ -102,7 +104,6 @@ public class MainActivity extends BaseActivity {
         context = this;
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        initKeyWords();
         initToolBar();
         initEditText();
         initTextView();
@@ -119,8 +120,6 @@ public class MainActivity extends BaseActivity {
 
     private void initDelete() {
         delete = (FrameLayout) findViewById(R.id.delete);
-        ((TextView) delete.findViewById(R.id.text_delete)).setText("DEL");
-        ((TextView) delete.findViewById(R.id.vice_delete)).setText("CLR");
         delete.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -146,13 +145,11 @@ public class MainActivity extends BaseActivity {
     }
 
     private void initConf() {
-        int[] y = {1, 3, 1, 3, 3};
-        for (int i = 0; i < y.length; i++)
-            barView.get(i).setNumColumns(preferences.getInt("CRy" + ("" + i), y[i]));
+        for (int i = 0; i < YY.length; i++)
+            barView.get(i).setNumColumns(preferences.getInt("CRy" + ("" + i), YY[i]));
 
-        int[] z = {6, 4, 5, 5, 5};
-        for (int i = 0; i < z.length; i++)
-            barAdapter.get(i).setValue(preferences.getInt("CRz" + ("" + i), z[i]));
+        for (int i = 0; i < ZZ.length; i++)
+            barAdapter.get(i).setValue(preferences.getInt("CRz" + ("" + i), ZZ[i]));
 
         realTime = preferences.getBoolean("real", true);
         findViewById(R.id.drawer_right).setOnClickListener(new View.OnClickListener() {
@@ -161,18 +158,6 @@ public class MainActivity extends BaseActivity {
                 drawer.openDrawer(GravityCompat.END);
             }
         });
-    }
-
-    private void initKeyWords() {
-        StringBuffer sb = new StringBuffer();
-        sb.append("(\\d+|\\b)(");
-        for (String[] array : FUNCTION)
-            for (String str : array) {
-                sb.append(str + "|");
-            }
-        sb.append("pi");
-        sb.append(")\\b");
-        keywords = Pattern.compile(sb.toString());
     }
 
     private void initTextView() {
@@ -231,7 +216,7 @@ public class MainActivity extends BaseActivity {
                 drawer.closeDrawer(GravityCompat.START);
             }
         });
-        GridViewAdapter sideBarAdapter = new GridViewAdapter(this, sideBar, Arrays.asList(FUNCTION_LIST),
+        GridViewAdapter sideBarAdapter = new GridViewAdapter(sideBar, Arrays.asList(FUNCTION_LIST),
                 null, R.layout.button_sidebar);
         barAdapter.add(sideBarAdapter);
         sideBar.setAdapter(sideBarAdapter);
@@ -252,7 +237,6 @@ public class MainActivity extends BaseActivity {
         drawerPageList = new ArrayList<>();
         for (int i = 0; i < 2; i++) {
             GridView gridView = new GridView(this);
-            gridView.setFastScrollEnabled(true);
             drawerPageList.add(gridView);
         }
 
@@ -304,23 +288,20 @@ public class MainActivity extends BaseActivity {
         for (View view : drawerPageList) {
             GridView operatorProBar = (GridView) view;
             barView.add(operatorProBar);
-            final String s = i == 0 ? "()" : "";
-            operatorProBar.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-                @Override
-                public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                    String str = ((TextView) view.findViewById(R.id.text_item)).getText().toString();
-                    Editable editable = inText.getText();
-                    int index = inText.getSelectionStart();
-                    editable.insert(index, str + s);
-                    if (!TextUtils.isEmpty(s))
-                        inText.setSelection(index + str.length() + s.length() - 1);
-                }
-            });
-            if (i == 0)
+
+            if (i == 0) {
+                operatorProBar.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                    @Override
+                    public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                        modifyInText(BUTTON[0][position] + "()");
+                        inText.setSelection(inText.getSelectionStart() - 1);
+                    }
+                });
+
                 operatorProBar.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
                     @Override
                     public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
-                        String text = ((TextView) view.findViewById(R.id.text_item)).getText().toString();
+                        String text = BUTTON[0][position];
                         AlertDialog.Builder dialog = new AlertDialog.Builder(MainActivity.this);
                         dialog.setTitle(text);
                         dialog.setMessage(HelpUtil.getFunctionHelp(text));
@@ -329,9 +310,30 @@ public class MainActivity extends BaseActivity {
                         return true;
                     }
                 });
+            } else {
+                operatorProBar.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                    @Override
+                    public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                        modifyInText(BUTTON[1][position]);
+                    }
+                });
+
+                operatorProBar.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
+                    @Override
+                    public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
+                        String text = BUTTON[1][position];
+                        AlertDialog.Builder dialog = new AlertDialog.Builder(MainActivity.this);
+                        dialog.setTitle(text);
+                        dialog.setMessage(HelpUtil.getFunctionHelp(text));
+                        dialog.setPositiveButton("确定", null);
+                        dialog.show();
+                        return true;
+                    }
+                });
+            }
             int id = i == 0 ? R.layout.button_function : R.layout.button_constant;
-            GridViewAdapter operatorProAdapter = new GridViewAdapter(this, operatorProBar,
-                    Arrays.asList(FUNCTION[i++]), Arrays.asList(FUNCTION_VICE[i - 1]), id);
+            GridViewAdapter operatorProAdapter = new GridViewAdapter(operatorProBar,
+                    Arrays.asList(BUTTON[i++]), Arrays.asList(BUTTON_VICE[i - 1]), id);
 
             barAdapter.add(operatorProAdapter);
             operatorProBar.setAdapter(operatorProAdapter);
@@ -344,22 +346,17 @@ public class MainActivity extends BaseActivity {
         operatorBar.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                String str = ((TextView) view.findViewById(R.id.text_item)).getText().toString();
-                Editable editable = inText.getText();
-                int index = inText.getSelectionStart();
-                editable.insert(index, str);
+                modifyInText(OPERATOR[position]);
             }
         });
         operatorBar.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
             @Override
             public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
-                String str = ((TextView) view.findViewById(R.id.text_vice_item)).getText().toString();
-                int index = inText.getSelectionStart();
-                inText.getText().insert(index, str);
+                modifyInText(OPERATOR_VICE[position]);
                 return true;
             }
         });
-        GridViewAdapter operatorAdapter = new GridViewAdapter(this, operatorBar, Arrays.asList(OPERATOR),
+        GridViewAdapter operatorAdapter = new GridViewAdapter(operatorBar, Arrays.asList(OPERATOR),
                 Arrays.asList(OPERATOR_VICE), R.layout.button_operator);
         barAdapter.add(operatorAdapter);
         operatorBar.setAdapter(operatorAdapter);
@@ -371,8 +368,7 @@ public class MainActivity extends BaseActivity {
         numericBar.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                String str = ((TextView) view.findViewById(R.id.text_item)).getText().toString();
-                int index = inText.getSelectionStart();
+                String str = position == 9 ? "." : NUMERIC[position];
                 if (str.equals("=")) {
                     if (calcThread != null) {
                         Snackbar.make(view, "请等待当前运算完成", Snackbar.LENGTH_SHORT)
@@ -385,20 +381,28 @@ public class MainActivity extends BaseActivity {
                         return;
                     }
                     outText.setTextColor(0xffbdbdbd);
-                    outText.setText("···");
                     stateText.setText("运算中...");
                     calcThread = new Calc(inText.getText().toString());
                     calcThread.start();
                     return;
                 }
-                str = str.equals("·") ? "." : str;
-                inText.getText().insert(index, str);
+                modifyInText(str);
             }
         });
-        GridViewAdapter numericAdapter = new GridViewAdapter(this, numericBar, Arrays.asList(NUMERIC),
+        GridViewAdapter numericAdapter = new GridViewAdapter(numericBar, Arrays.asList(NUMERIC),
                 null, R.layout.button_numeric);
         barAdapter.add(numericAdapter);
         numericBar.setAdapter(numericAdapter);
+    }
+
+    private void modifyInText(String str) {
+        int index = inText.getSelectionStart();
+        int index2 = inText.getSelectionEnd();
+        if (index == index2) {
+            inText.getText().insert(index, str);
+        } else {
+            inText.getText().replace(index, index2, str);
+        }
     }
 
     class FastCalc extends Thread implements Runnable {
@@ -506,14 +510,14 @@ public class MainActivity extends BaseActivity {
                 for (int n = spans.length; n-- > 0; )
                     s.removeSpan(spans[n]);
 
-                for (Matcher m = Pattern.compile("[\\p{P}+^=÷×√°]").matcher(s); m.find(); )
+                for (Matcher m = Pattern.compile("[\\p{P}+^=÷×√]").matcher(s); m.find(); )
                     s.setSpan(new ForegroundColorSpan(0xff81d4fa), m.start(), m.end(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
-                for (Matcher m = Pattern.compile("[∞xi]").matcher(s); m.find(); )
+                for (Matcher m = Pattern.compile("[∞xi°]").matcher(s); m.find(); )
                     s.setSpan(new ForegroundColorSpan(0xfff48fb1), m.start(), m.end(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
-                for (Matcher m = keywords.matcher(s); m.find(); )
+                for (Matcher m = FUNCTIONS_KEYWORDS.matcher(s); m.find(); )
                     s.setSpan(new ForegroundColorSpan(0xffa5d6a7), m.start(), m.end(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
-                for (Matcher m = Pattern.compile("\\d*").matcher(s); m.find(); )
-                    s.setSpan(new ForegroundColorSpan(0xffeeeeee), m.start(), m.end(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+                for (Matcher m = CONSTANS_KEYWORDS.matcher(s); m.find(); )
+                    s.setSpan(new ForegroundColorSpan(0xfffff59d), m.start(), m.end(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
                 modified = false;
                 inText.setText(s);
                 modified = true;
@@ -534,6 +538,7 @@ public class MainActivity extends BaseActivity {
     private void setGodMode(boolean isGodMode) {
         InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
         ActionBar actionBar = getSupportActionBar();
+        godMenuItem.setChecked(isGodMode);
         if (isGodMode) {
             actionBar.setDisplayHomeAsUpEnabled(false);
             drawer.setVisibility(View.GONE);
@@ -563,20 +568,20 @@ public class MainActivity extends BaseActivity {
         }
     }
 
+    private MenuItem godMenuItem;
+
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        godMode = menu.add("上帝输入").setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
+        boolean isGodMode = preferences.getBoolean("godMode", false);
+        godMenuItem = menu.add("上帝输入").setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
             @Override
             public boolean onMenuItemClick(MenuItem item) {
                 boolean isGodMode = !item.isChecked();
                 preferences.edit().putBoolean("godMode", isGodMode).apply();
-                item.setChecked(isGodMode);
                 setGodMode(isGodMode);
                 return true;
             }
-        });
-        boolean isGodMode = preferences.getBoolean("godMode", false);
-        godMode.setCheckable(true).setChecked(isGodMode);
+        }).setCheckable(true).setChecked(isGodMode);
         setGodMode(isGodMode);
 
         menu.add("帮助").setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {

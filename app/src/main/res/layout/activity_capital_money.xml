@@ -13,7 +13,6 @@
         android:fontFamily="sans-serif-light"
         android:gravity="center"
         android:inputType="numberDecimal"
-        android:textCursorDrawable="@drawable/cursor"
         android:textSize="66sp" />
 
     <TextView

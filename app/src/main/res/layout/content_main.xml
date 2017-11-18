@@ -26,21 +26,21 @@
             android:foreground="?android:attr/selectableItemBackground">
 
             <TextView
-                android:id="@+id/text_delete"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
                 android:fontFamily="sans-serif-light"
+                android:text="DEL"
                 android:textColor="@color/colorWhite"
                 android:textSize="20sp" />
 
             <TextView
-                android:id="@+id/vice_delete"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="right"
                 android:paddingRight="12dp"
                 android:paddingTop="6dp"
+                android:text="CLR"
                 android:textColor="@color/colorWhite"
                 android:textSize="12sp" />
 

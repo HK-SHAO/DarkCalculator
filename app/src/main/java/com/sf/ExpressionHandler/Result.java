@@ -19,7 +19,7 @@ public class Result {
 
     public Result setAnswer(String answer) {
         val.setAnswer(answer);
-        append(answer);
+        //append(answer);
         return this;
     }
 
