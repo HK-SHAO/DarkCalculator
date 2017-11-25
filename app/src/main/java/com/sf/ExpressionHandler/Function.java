@@ -5,9 +5,6 @@ package com.sf.ExpressionHandler;
  */
 
 class Function {
-
-    // place a function serial here, interval 10 (accept maximum 10 params.)
-
     static final int EXP = 10;
     static final int LN = 20;
     static final int RE = 30;
@@ -42,33 +39,19 @@ class Function {
 
     static final int CBRT = 320;
     static final int LG = 330;
-    static final int SINH = 340;
-    static final int COSH = 350;
-    static final int TANH = 360;
-    static final int ASINH = 370;
-    static final int ACOSH = 380;
-    static final int ATANH = 390;
-    static final int MAX = 400;
-    static final int MIN = 410;
-    static final int FACT = 420;
-    static final int RECIPR = 430;
-    static final int PRIME = 440;
-    static final int ISPRIME = 450;
-    static final int GCD = 460;
-    static final int LCM = 470;
-    static final int ISODD = 480;
-    static final int LOG = 490;
-    static final int SIGN = 500;
-    static final int RESTART = 510;
-    static final int SETCR = 520;
-    static final int SETTS = 530;
-    static final int RANDINT = 540;
-    static final int TODEG = 550;
-    static final int TORAD = 560;
-    static final int REMN = 570;
-    static final int REDUC = 580;
-    static final int ROOT = 590;
-    static final int CUST = 600;
+    static final int MAX = 340;
+    static final int MIN = 350;
+    static final int FACT = 360;
+    static final int PRIME = 370;
+    static final int ISPRIME = 380;
+    static final int GCD = 390;
+    static final int LCM = 400;
+    static final int LOG = 410;
+    static final int SIGN = 420;
+    static final int RANDINT = 430;
+    static final int REMN = 440;
+    static final int ROOT = 450;
+    static final int CUST = 460;
 
     static class Serial { // function name - serial struct
         String funcName;
@@ -106,6 +89,7 @@ class Function {
             new Serial("acos", ACOS),
             new Serial("atan", ATAN),
             new Serial("gamma", GAMMA),
+            new Serial("Γ", GAMMA),
             new Serial("floor", FLOOR),
             new Serial("ceil", CEIL),
             new Serial("reg", REG),
@@ -120,36 +104,22 @@ class Function {
             new Serial("sum", SUM, 1),
             new Serial("perm", PERM),
             new Serial("comb", COMB),
-            new Serial("setPrec", PREC),
-            new Serial("setBase", BASE),
+            new Serial("prec", PREC),
+            new Serial("base", BASE),
 
             new Serial("cbrt", CBRT),
             new Serial("lg", LG),
-            new Serial("sinh", SINH),
-            new Serial("cosh", COSH),
-            new Serial("tanh", TANH),
-            new Serial("asinh", ASINH),
-            new Serial("acosh", ACOSH),
-            new Serial("atanh", ATANH),
             new Serial("max", MAX),
             new Serial("min", MIN),
             new Serial("fact", FACT),
-            new Serial("recipr", RECIPR),
             new Serial("prime", PRIME),
             new Serial("isPrime", ISPRIME),
             new Serial("gcd", GCD),
             new Serial("lcm", LCM),
-            new Serial("isOdd", ISODD),
             new Serial("log", LOG),
             new Serial("sign", SIGN),
-            new Serial("reStart", RESTART),
-            new Serial("setCR", SETCR),
-            new Serial("setTS", SETTS),
             new Serial("randInt", RANDINT),
-            new Serial("toDEG", TODEG),
-            new Serial("toRAD", TORAD),
             new Serial("remn", REMN),
-            new Serial("reduc", REDUC),
             new Serial("root", ROOT),
             new Serial("cust", CUST)
     };

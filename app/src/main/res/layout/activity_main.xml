@@ -25,11 +25,12 @@
                 android:id="@+id/editText"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:layout_marginTop="-4dp"
+                android:layout_marginBottom="52dp"
+                android:layout_marginTop="30dp"
                 android:background="@null"
                 android:fontFamily="sans-serif-light"
                 android:gravity="center_vertical|end"
-                android:inputType="textNoSuggestions"
+                android:inputType="textNoSuggestions|textMultiLine"
                 android:paddingLeft="16dp"
                 android:paddingRight="16dp"
                 android:textColor="#eeeeee"
@@ -45,8 +46,7 @@
             <HorizontalScrollView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_gravity="bottom"
-                android:layout_marginTop="-4dp">
+                android:layout_gravity="bottom">
 
                 <TextView
                     android:id="@+id/text_out"

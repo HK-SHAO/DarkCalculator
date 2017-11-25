@@ -31,13 +31,6 @@ public class HelpUtil {
         map.put("asin", "asin函数返回输入参数的反正弦，需要1个参数");
         map.put("acos", "acos函数返回输入参数的反余弦，需要1个参数");
         map.put("atan", "atan函数返回输入参数的反正切，需要1个参数");
-        map.put("sinh", "sinh函数返回输入参数的双曲正弦，需要1个参数");
-        map.put("cosh", "cosh函数返回输入参数的双曲余弦，需要1个参数");
-        map.put("tanh", "tanh函数返回输入参数的双曲正切，需要1个参数");
-        map.put("asinh", "asinh函数返回输入参数的反双曲正弦，需要1个参数");
-        map.put("acosh", "acosh函数返回输入参数的反双曲余弦，需要1个参数");
-        map.put("atanh", "atanh函数返回输入参数的反双曲正切，需要1个参数");
-        map.put("recipr", "recipr函数返回输入参数的倒数，虽然没卵用，但还是需要1个参数");
         map.put("sum", "sum函数返回输入参数累加求和的值，需要3个参数，第1个参数为携带变量x的函数，第2个参数为累加的开始值，第3个参数为累加的结束值");
         map.put("re", "re函数返回输入参数的实部，需要1个参数");
         map.put("im", "im函数返回输入参数的虚部，需要1个参数");
@@ -61,19 +54,10 @@ public class HelpUtil {
         map.put("sign", "sign函数返回输入参数的正负性，若为正数返回1，若为0返回0，若为负数返回-1，需要1个参数");
         map.put("gamma", "gamma函数返回输入参数的欧拉第二积分，需要1个参数");
         map.put("remn", "remn函数返回输入参数的余数，需要2个参数，第1个参数为被除数，第2个参数为余数");
-        map.put("reduc", "reduc函数返回输入参数的的最简分数形式，需要2个参数，第1个参数是分子，第2个参数是分母");
         map.put("prime", "prime函数返回第输入参数个的质数，需要1个参数");
         map.put("isPrime", "isPrime函数返回输入参数是否为质数，需要1个参数");
-        map.put("isOdd", "isOdd函数返回输入参数是否为奇数，虽然没卵用，但还是需要1个参数");
-        map.put("toDEG", "toDEG函数返回输入参数的角度值，需要1个参数");
-        map.put("toRAD", "toRAD函数返回输入参数的弧度值，需要1个参数");
-        map.put("reStart", "reStart函数用于重启APP，不需要参数");
-        map.put("setPrec", "setPrec函数用于设置输出的精度，需要1个参数，当没有给参数时将输出的精度设置为默认");
-        map.put("setBase", "setBase函数用于设置输出的进制，需要1个参数，当没有给参数时将输出的进制设置为默认");
-        map.put("setCR", "setCR函数用于设置按钮区的排列方式，需要3个参数，第1个参数为对应的按钮区（从0开始为最左边的侧滑栏），第2个参数为每行按钮的个数，第3个参数为每列按钮的个数（注意，输入的参数千万不要太大或者太小，否则你可能需要清除应用数据以恢复按钮的排列方式）");
-        map.put("setTS", "setTS函数用于设置全局字体大小的缩放比例，需要1个参数（注意，输入的参数千万不要太大或者太小，否则你可能需要清除应用数据以恢复字体大小）");
-        map.put("cust", "cust函数用于自定义此计算器，需要2个参数，第1个参数为自定义的ID，第2个参数为需更改的值\n\n目前可自定义ID有：\n1：用于设置计算器是否进行实时计算，更改的参数可以是true和false");
-
+        map.put("prec", "prec函数用于设置输出的精度，需要1个参数，当没有给参数时将输出的精度设置为默认");
+        map.put("base", "base函数用于设置输出的进制，需要1个参数，当没有给参数时将输出的进制设置为默认");
     }
 
     public static String getFunctionHelp(String key) {

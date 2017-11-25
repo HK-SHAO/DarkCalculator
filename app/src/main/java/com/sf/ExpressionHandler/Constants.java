@@ -24,6 +24,7 @@ public class Constants {
             map.put("me", "9.10938188E-31");
             map.put("mn", "1.67262158E-27");
             map.put("mp", "1.67492716E-27");
+            map.put("K", "2.6854520010");
             map.put("false", "0");
             map.put("true", "1");
             constants = map;

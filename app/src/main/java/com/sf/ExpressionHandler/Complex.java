@@ -6,7 +6,7 @@ public class Complex {
     public static Complex E = new Complex(Math.E);
     public static Complex PI = new Complex(Math.PI);
     public static Complex I = new Complex(0, 1);
-    public static Complex Inf = new Complex(Double.POSITIVE_INFINITY, Double.NaN);
+    public static Complex Inf = new Complex(Double.POSITIVE_INFINITY);
 
     public int err = 0;
     public double re;
@@ -210,12 +210,6 @@ public class Complex {
         return div(ln(c2), ln(c));
     }
 
-    public static Complex isOdd(Complex c) {
-        if (c.im != 0)
-            return new Complex().error(3);
-        return new Complex(c.re % 2 != 0);
-    }
-
     public static Complex max(Complex c, Complex c2) {
         if (c.im != 0 || c2.im != 0)
             return new Complex().error(3);
@@ -226,36 +220,6 @@ public class Complex {
         if (c.im != 0 || c2.im != 0)
             return new Complex().error(3);
         return new Complex(Math.min(c.re, c2.re));
-    }
-
-    public static Complex sinh(Complex c) {
-        return div(sub(exp(c), exp(mul(new Complex(-1), c))), new Complex(2));
-    }
-
-    public static Complex cosh(Complex c) {
-        return div(add(exp(c), exp(mul(new Complex(-1), c))), new Complex(2));
-    }
-
-    public static Complex tanh(Complex c) {
-        return div(sinh(c), cosh(c));
-    }
-
-    public static Complex asinh(Complex c) {
-        if (c.im != 0)
-            return new Complex().error(3);
-        return new Complex(Math.log(c.re + Math.sqrt(c.re * c.re + 1)));
-    }
-
-    public static Complex acosh(Complex c) {
-        if (c.im != 0)
-            return new Complex().error(3);
-        return new Complex(Math.log(c.re + Math.sqrt(c.re * c.re - 1)));
-    }
-
-    public static Complex atanh(Complex c) {
-        if (c.im != 0)
-            return new Complex().error(3);
-        return new Complex(0.5 * Math.log((c.re + 1) / (c.re - 1)));
     }
 
     public static Complex ln(Complex c) {

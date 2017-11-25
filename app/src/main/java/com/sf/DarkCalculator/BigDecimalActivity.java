@@ -5,11 +5,9 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.Snackbar;
 import android.view.View;
-import android.view.inputmethod.EditorInfo;
 import android.widget.EditText;
 
 import java.math.BigDecimal;
-import java.util.ArrayList;
 
 public class BigDecimalActivity extends BaseActivity implements View.OnClickListener {
 

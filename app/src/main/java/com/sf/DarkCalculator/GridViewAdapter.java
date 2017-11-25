@@ -15,15 +15,16 @@ public class GridViewAdapter extends BaseAdapter {
     private List<String> viceText;
     private GridView gridView;
     private int layoutId;
-    private int value;
+    private int rows;
     private static int height;
     private ViewGroup.LayoutParams deleteParam;
 
-    public GridViewAdapter(GridView gridView, List<String> text, List<String> viceText, int layoutId) {
+    public GridViewAdapter(GridView gridView, List<String> text, List<String> viceText, int layoutId, int rows) {
         this.text = text;
         this.viceText = viceText;
         this.gridView = gridView;
         this.layoutId = layoutId;
+        this.rows = rows;
     }
 
     @Override
@@ -73,23 +74,18 @@ public class GridViewAdapter extends BaseAdapter {
 
         GridView.LayoutParams param = new GridView.LayoutParams(
                 ViewGroup.LayoutParams.MATCH_PARENT,
-                height / value);
+                height / rows);
         view.setLayoutParams(param);
 
         if (layoutId == R.layout.button_operator) {
             if (deleteParam == null)
                 deleteParam = MainActivity.activity.delete.getLayoutParams();
-            if (deleteParam.height != height / value) {
-                deleteParam.height = height / value;
+            if (deleteParam.height != height / rows) {
+                deleteParam.height = height / rows;
                 MainActivity.activity.delete.setLayoutParams(deleteParam);
             }
         }
 
         return view;
-    }
-
-    public void setValue(int value) {
-        this.value = value;
-        notifyDataSetChanged();
     }
 }

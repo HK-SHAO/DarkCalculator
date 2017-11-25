@@ -1,8 +1,6 @@
 package com.sf.DarkCalculator;
 
 import android.content.SharedPreferences;
-import android.content.res.Configuration;
-import android.content.res.Resources;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.v7.app.AppCompatActivity;
@@ -15,6 +13,7 @@ public class BaseActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        preferences = PreferenceManager.getDefaultSharedPreferences(this);
     }
 
     @Override
@@ -25,15 +24,5 @@ public class BaseActivity extends AppCompatActivity {
                 break;
         }
         return true;
-    }
-
-    @Override
-    public Resources getResources() {
-        preferences = PreferenceManager.getDefaultSharedPreferences(this);
-        Resources res = super.getResources();
-        Configuration config = res.getConfiguration();
-        config.fontScale = preferences.getFloat("textSize", 1.0f);
-        res.updateConfiguration(config, res.getDisplayMetrics());
-        return res;
     }
 }
