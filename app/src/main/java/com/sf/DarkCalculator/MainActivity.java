@@ -55,21 +55,21 @@ public class MainActivity extends BaseActivity {
     private static final String[] OPERATOR_VICE = {"√", "^", "!", "()", "°", "∞", "x"};
 
     private static final String[][] BUTTON = {
-            {"sqrt", "cbrt", "root", "rand", "randInt", "lg", "ln", "log",
-                    "abs", "min", "max", "fact", "sin", "cos", "tan", "asin",
-                    "acos", "atan", "re", "im", "arg", "norm", "reg", "conj",
-                    "diff", "sum", "lim", "eval", "fzero", "integ", "exp", "gcd",
-                    "lcm", "perm", "comb", "round", "floor", "ceil", "sign",
-                    "gamma", "remn", "prime", "isPrime", "prec", "base"},
-            {"ans", "reg", "π", "e", "F", "h", "ћ", "γ", "φ", "c", "N", "R", "K", "k", "G", "Φ", "true", "false", "me", "mn", "mp"}};
+            {"sqrt", "cbrt", "root", "rand", "randInt", "abs", "lg", "ln", "log",
+                    "min", "max", "fact", "sin", "cos", "tan", "asin", "acos",
+                    "atan", "re", "im", "arg", "norm", "reg", "conj", "diff",
+                    "sum", "lim", "eval", "fzero", "integ", "exp", "gcd", "lcm",
+                    "perm", "comb", "gamma", "round", "floor", "ceil", "sign",
+                    "remn", "prime", "isPrime", "prec", "base"},
+            {"ans", "reg", "π", "e", "F", "h", "ћ", "γ", "φ", "c",
+                    "N", "R", "K", "k", "G", "Φ", "true", "false", "me", "mn", "mp"}};
 
     private static final String[][] BUTTON_VICE = {
-            {"平方根", "立方根", "开方", "随机复数", "随机整数", "常用对数", "自然对数", "对数",
-                    "绝对值", "最小", "最大", "阶乘", "正弦", "余弦", "正切", "反正弦", "反余弦",
-                    "反正切", "实部", "虚部", "辐角", "模长", "寄存", "共轭复数", "导函数", "累加求和",
-                    "极限", "求值", "函数零点", "定积分", "e底指数", "最大公约", "最小公倍", "排列",
-                    "组合", "四舍五入", "向下取整", "向上取整", "取正负号", "伽玛函数", "取余", "质数",
-                    "判断质数", "输出精度", "输出进制"},
+            {"平方根", "立方根", "开方", "随机复数", "随机整数", "绝对值", "常用对数", "自然对数", "对数",
+                    "最小", "最大", "阶乘", "正弦", "余弦", "正切", "反正弦", "反余弦", "反正切", "实部",
+                    "虚部", "辐角", "模长", "寄存", "共轭复数", "导函数", "累加求和", "极限", "求值",
+                    "函数零点", "定积分", "e底指数", "最大公约", "最小公倍", "排列", "组合", "伽玛函数",
+                    "四舍五入", "向下取整", "向上取整", "取正负号", "取余", "质数", "判断质数", "输出精度", "输出进制"},
             {"上次运算", "寄存器", "圆周率", "自然底数", "法拉第", "普朗克", "约化普朗克",
                     "欧拉", "黄金分割", "光速", "阿伏伽德罗", "理想气体", "卡钦", "玻尔兹曼",
                     "万有引力", "磁通量子", "真", "假", "电子质量", "质子质量", "中子质量"}};
@@ -174,7 +174,6 @@ public class MainActivity extends BaseActivity {
 
     private void initDrawer() {
         drawer = (DrawerLayout) findViewById(R.id.drawer_main);
-        drawer.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED, GravityCompat.START);
         findViewById(R.id.drawer_right).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -209,8 +208,10 @@ public class MainActivity extends BaseActivity {
             public void onPageSelected(int position) {
                 if (position == 0) {
                     drawer.setDrawerLockMode(DrawerLayout.LOCK_MODE_UNLOCKED, GravityCompat.END);
+                    drawer.setDrawerLockMode(DrawerLayout.LOCK_MODE_UNLOCKED, GravityCompat.START);
                 } else {
                     drawer.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_OPEN, GravityCompat.END);
+                    drawer.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED, GravityCompat.START);
                 }
             }
 

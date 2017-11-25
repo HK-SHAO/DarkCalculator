@@ -455,7 +455,7 @@ public class Expression {
 
         // Not found
         if (listPos < 0)
-            return new Result(1).setAnswer("没有函数 “" + s.substring(0, s.length() - 2) + "”");
+            return new Result(1).setAnswer("没有函数 “" + s.substring(0, s.length()) + "”");
 
         funcID = Function.funcList[listPos].funcSerial;
         leftBr = l + Function.funcList[listPos].funcName.length();
