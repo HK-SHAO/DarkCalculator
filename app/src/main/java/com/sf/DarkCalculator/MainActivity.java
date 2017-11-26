@@ -316,8 +316,7 @@ public class MainActivity extends BaseActivity {
                 operatorProBar.setOnItemClickListener(new AdapterView.OnItemClickListener() {
                     @Override
                     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                        modifyInText((BUTTON[0][position] == "gamma" ? "Γ" : BUTTON[0][position]) + "()");
-                        inText.setSelection(inText.getSelectionStart() - 1);
+                        modifyInText((BUTTON[0][position].equals("gamma") ? "Γ" : BUTTON[0][position]) + "()");
                     }
                 });
 
@@ -433,7 +432,6 @@ public class MainActivity extends BaseActivity {
         inText.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-
             }
 
             @Override
@@ -474,6 +472,9 @@ public class MainActivity extends BaseActivity {
                 modified = false;
                 inText.setText(s);
                 modified = true;
+
+                if (selection >= 2 && s.toString().substring(selection - 2, selection).equals("()"))
+                    selection--;
                 inText.setSelection(selection);
             }
         });

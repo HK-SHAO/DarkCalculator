@@ -487,24 +487,18 @@ public class Expression {
 
         int funcJump = funcID + paramNum;
         switch (funcJump) {
-            case Function.CUST + 2:
-                if (val[0].im != 0 || val[1].im != 0)
-                    return new Result(3);
-                if (val[0].re % 1 != 0 || val[0].re <= 0)
-                    return new Result(1).setAnswer("自定义的ID必须是正整数");
-                switch ((int) val[0].re) {
-                    case 1:
-                        MainActivity.preferences.edit().putBoolean("real", val[1].re == 1).apply();
-                        return new Result(0).setAnswer("设置成功，点击此处重启APP生效");
-                    default:
-                        return new Result(1).setAnswer("不存在此ID");
-                }
             case Function.ROOT + 2:
                 return new Result(Complex.pow(val[0], Complex.div(new Complex(1), val[1])));
             case Function.REMN + 2:
                 if (val[0].im != 0 || val[1].im != 0)
                     return new Result(3);
                 return new Result(new Complex(val[0].re % val[1].re));
+            case Function.RANDINT:
+                return new Result(new Complex(Math.round(Math.random())));
+            case Function.RANDINT + 1:
+                if (val[0].im != 0)
+                    return new Result(3);
+                return new Result(new Complex(Math.round(Math.random() * val[0].re)));
             case Function.RANDINT + 2:
                 if (val[0].im != 0 || val[1].im != 0)
                     return new Result(3);

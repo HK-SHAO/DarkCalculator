@@ -51,7 +51,6 @@ class Function {
     static final int RANDINT = 430;
     static final int REMN = 440;
     static final int ROOT = 450;
-    static final int CUST = 460;
 
     static class Serial { // function name - serial struct
         String funcName;
@@ -120,7 +119,6 @@ class Function {
             new Serial("sign", SIGN),
             new Serial("randInt", RANDINT),
             new Serial("remn", REMN),
-            new Serial("root", ROOT),
-            new Serial("cust", CUST)
+            new Serial("root", ROOT)
     };
 }

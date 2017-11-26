@@ -25,7 +25,7 @@
                 android:id="@+id/editText"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:layout_marginBottom="52dp"
+                android:layout_marginBottom="54dp"
                 android:layout_marginTop="30dp"
                 android:background="@null"
                 android:fontFamily="sans-serif-light"
